@@ -1,0 +1,31 @@
+{
+  "name": "starlight-telescope",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.",
+  "author": "frostybee",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "devDependencies": {
+    "@astrojs/starlight": "^0.37.4",
+    "astro": "^5.16.15"
+  },
+  "peerDependencies": {
+    "@astrojs/starlight": ">=0.37"
+  },
+  "engines": {
+    "node": "^18.17.1 || ^20.3.0 || >=21.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/frostybee/starlight-telescope",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frostybee/starlight-telescope.git",
+    "directory": "packages/starlight-telescope"
+  },
+  "bugs": "https://github.com/frostybee/starlight-telescope/issues"
+}

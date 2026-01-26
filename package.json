@@ -1,0 +1,19 @@
+{
+  "name": "starlight-telescope-monorepo",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.",
+  "author": "frostybee",
+  "type": "module",
+  "engines": {
+    "node": "^18.17.1 || ^20.3.0 || >=21.0.0"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "private": true,
+  "homepage": "https://github.com/frostybee/starlight-telescope",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frostybee/starlight-telescope.git"
+  },
+  "bugs": "https://github.com/frostybee/starlight-telescope/issues"
+}
