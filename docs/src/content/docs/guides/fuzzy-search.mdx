@@ -1,0 +1,131 @@
+---
+title: Fuzzy Search
+description: Configure intelligent fuzzy search with Fuse.js.
+---
+
+## How Search Works
+
+starlight-telescope uses [Fuse.js](https://fusejs.io/) for fuzzy matching, allowing users to find pages even with typos or partial queries.
+
+### Search Ranking
+
+Results are ranked by:
+1. **Exact title matches** — highest priority
+2. **Title prefix matches** — e.g., "get" matches "Getting Started"
+3. **Word-start matches** — e.g., "auth" matches "OAuth Authentication"
+4. **Fuzzy score** — calculated by Fuse.js
+
+### Match Highlighting
+
+Matching text is automatically highlighted in results using the `<mark>` element with the `.telescope-highlight` class.
+
+## Configuring Search Sensitivity
+
+### Threshold
+
+The `threshold` option (0.0 to 1.0) controls how fuzzy matches can be:
+
+```js
+fuseOptions: {
+  threshold: 0.3  // Default - allows minor typos
+}
+```
+
+| Value | Behavior |
+|-------|----------|
+| `0.0` | Exact matches only |
+| `0.3` | Minor typos allowed (default) |
+| `0.5` | Moderate fuzziness |
+| `0.7` | Very lenient matching |
+
+### Distance
+
+Controls how far a match can be from the expected position:
+
+```js
+fuseOptions: {
+  distance: 100  // Default
+}
+```
+
+Lower values require matches to be closer to the start of the string.
+
+### Ignore Location
+
+When `true`, matches anywhere in the string are weighted equally:
+
+```js
+fuseOptions: {
+  ignoreLocation: true
+}
+```
+
+This is useful for finding matches in long titles regardless of position.
+
+## Custom Search Fields
+
+By default, the plugin searches:
+
+| Field | Weight | Description |
+|-------|--------|-------------|
+| `title` | 1.0 | Page title (highest priority) |
+| `path` | 0.6 | URL path |
+| `description` | 0.3 | Page description |
+
+### Adjusting Weights
+
+Give more weight to descriptions:
+
+```js
+fuseOptions: {
+  keys: [
+    { name: 'title', weight: 1.0 },
+    { name: 'description', weight: 0.8 },
+    { name: 'path', weight: 0.3 },
+  ]
+}
+```
+
+### Search Only Titles
+
+```js
+fuseOptions: {
+  keys: [
+    { name: 'title', weight: 1.0 }
+  ]
+}
+```
+
+## Debouncing
+
+Reduce CPU usage by delaying search until typing pauses:
+
+```js
+debounceMs: 200  // Wait 200ms after typing stops
+```
+
+The default is `100ms`. Higher values are better for slower devices or very large documentation sites.
+
+## Complete Example
+
+```js
+starlightTelescope({
+  fuseOptions: {
+    // More lenient matching
+    threshold: 0.5,
+
+    // Match anywhere in string
+    ignoreLocation: true,
+
+    // Custom field weights
+    keys: [
+      { name: 'title', weight: 1.0 },
+      { name: 'description', weight: 0.7 },
+      { name: 'path', weight: 0.4 },
+    ],
+  },
+
+  // Longer debounce for large sites
+  debounceMs: 200,
+})
+```

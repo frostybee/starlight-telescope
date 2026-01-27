@@ -1,0 +1,88 @@
+---
+title: Keyboard Shortcuts
+description: Master keyboard navigation in starlight-telescope.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+## Opening the Search Modal
+
+By default, press **Ctrl+/** (Windows/Linux) or **Cmd+/** (Mac) to open the search.
+
+The plugin automatically detects your platform and displays the appropriate shortcut in the trigger button.
+
+## Navigation Shortcuts
+
+Once the modal is open:
+
+| Key | Action |
+|-----|--------|
+| **Arrow Down** | Move to next result |
+| **Arrow Up** | Move to previous result |
+| **Enter** | Navigate to selected page |
+| **Space** | Pin/unpin selected page (when not typing) |
+| **Escape** | Close the modal |
+
+## Customizing the Shortcut
+
+### Using Ctrl+K (VS Code style)
+
+```js
+starlightTelescope({
+  shortcut: { key: 'k', ctrl: true, meta: true }
+})
+```
+
+### Using Ctrl+P (Quick Open style)
+
+```js
+starlightTelescope({
+  shortcut: { key: 'p', ctrl: true, meta: true }
+})
+```
+
+### Adding Shift Modifier
+
+```js
+starlightTelescope({
+  shortcut: { key: 'f', ctrl: true, meta: true, shift: true }
+})
+```
+
+## Shortcut Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `key` | `string` | `'/'` | The key to press |
+| `ctrl` | `boolean` | `true` | Require Ctrl key |
+| `meta` | `boolean` | `true` | Require Meta/Cmd key (Mac) |
+| `shift` | `boolean` | `false` | Require Shift key |
+| `alt` | `boolean` | `false` | Require Alt key |
+
+## Platform Detection
+
+The plugin automatically:
+- Shows **Ctrl** on Windows/Linux
+- Shows **⌘** (Cmd) on Mac
+- Sets appropriate `aria-keyshortcuts` attribute for accessibility
+
+## Keyboard Flow Example
+
+```
+1. Ctrl+/ → Open modal
+2. Type "api" → Filter results
+3. ↓ ↓ → Navigate to "API Reference"
+4. Space → Pin the page
+5. Enter → Navigate to page
+
+Next time:
+1. Ctrl+/ → "API Reference" appears at top (pinned)
+```
+
+## Accessibility
+
+All keyboard interactions are accessible:
+- **ARIA live regions** announce navigation changes to screen readers
+- **Focus management** — focus moves to search input when modal opens
+- **Tab trapping** — focus stays within modal while open
+- **Reduced motion** — animations respect `prefers-reduced-motion`

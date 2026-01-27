@@ -1,0 +1,207 @@
+---
+title: Styling & Theming
+description: Customize the appearance of the search modal.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+## CSS Custom Properties
+
+starlight-telescope uses CSS custom properties for all colors, making it easy to match your site's theme.
+
+### Available Properties
+
+```css
+:root {
+  /* Overlay/backdrop */
+  --telescope-overlay-bg: rgba(1, 4, 9, 0.8);
+
+  /* Modal backgrounds */
+  --telescope-modal-bg: #0d1117;
+  --telescope-modal-bg-alt: #010409;
+
+  /* Accent colors */
+  --telescope-accent: #0969da;
+  --telescope-accent-hover: rgba(9, 105, 218, 0.1);
+  --telescope-accent-selected: rgba(9, 105, 218, 0.15);
+
+  /* Text colors */
+  --telescope-text-primary: #e6edf3;
+  --telescope-text-secondary: #7d8590;
+
+  /* Borders */
+  --telescope-border: #21262d;
+  --telescope-border-active: #30363d;
+
+  /* Feature colors */
+  --telescope-pin-color: #8250df;
+  --telescope-tag-color: #1a7f37;
+}
+```
+
+## Configuration-Based Theming
+
+Set theme colors directly in your config:
+
+```js
+starlightTelescope({
+  theme: {
+    accentColor: '#7c3aed',
+    accentHover: 'rgba(124, 58, 237, 0.1)',
+    accentSelected: 'rgba(124, 58, 237, 0.15)',
+    pinColor: '#f59e0b',
+    modalBackground: '#1e1e2e',
+  }
+})
+```
+
+## CSS Override Method
+
+For more control, override CSS variables in your custom stylesheet:
+
+```css
+/* src/styles/custom.css */
+:root {
+  --telescope-accent: var(--sl-color-accent);
+  --telescope-modal-bg: var(--sl-color-bg);
+}
+```
+
+## Theme Examples
+
+<Tabs>
+<TabItem label="Purple">
+```js
+theme: {
+  accentColor: '#a855f7',
+  accentHover: 'rgba(168, 85, 247, 0.1)',
+  accentSelected: 'rgba(168, 85, 247, 0.15)',
+  pinColor: '#ec4899',
+}
+```
+</TabItem>
+<TabItem label="Green">
+```js
+theme: {
+  accentColor: '#22c55e',
+  accentHover: 'rgba(34, 197, 94, 0.1)',
+  accentSelected: 'rgba(34, 197, 94, 0.15)',
+  pinColor: '#14b8a6',
+}
+```
+</TabItem>
+<TabItem label="Light">
+```js
+theme: {
+  overlayBackground: 'rgba(255, 255, 255, 0.8)',
+  modalBackground: '#ffffff',
+  modalBackgroundAlt: '#f6f8fa',
+  textPrimary: '#24292f',
+  textSecondary: '#57606a',
+  border: '#d0d7de',
+  borderActive: '#8c959f',
+}
+```
+</TabItem>
+</Tabs>
+
+## Customizing Specific Elements
+
+### Search Input
+
+```css
+.telescope-search-input {
+  font-size: 20px;
+  font-family: var(--sl-font);
+}
+```
+
+### Result Items
+
+```css
+.telescope-result-item {
+  padding: 16px 24px;
+}
+
+.telescope-result-title {
+  font-size: 16px;
+}
+
+.telescope-result-description {
+  font-size: 13px;
+}
+```
+
+### Match Highlighting
+
+```css
+.telescope-highlight {
+  background-color: rgba(255, 200, 0, 0.3);
+  border-radius: 3px;
+}
+```
+
+### Pin Button
+
+```css
+.telescope-pin-button {
+  color: #f59e0b;
+}
+
+.telescope-pin-button.pinned {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.2);
+}
+```
+
+## Available CSS Classes
+
+| Class | Element |
+|-------|---------|
+| `.telescope-dialog` | Modal dialog container |
+| `.telescope-modal` | Modal content wrapper |
+| `.telescope-search-input` | Search input field |
+| `.telescope-tabs` | Tab bar container |
+| `.telescope-tab` | Individual tab |
+| `.telescope-result-item` | Search result item |
+| `.telescope-result-title` | Result title |
+| `.telescope-result-description` | Result description |
+| `.telescope-pin-button` | Pin/bookmark button |
+| `.telescope-highlight` | Match highlight |
+| `.telescope-section-separator` | Section header |
+| `.telescope-footer` | Modal footer |
+
+## Reduced Motion
+
+The plugin respects `prefers-reduced-motion`. When users prefer reduced motion, all animations are disabled:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .telescope-dialog[open],
+  .telescope-result-item {
+    animation: none;
+    transition: none;
+  }
+}
+```
+
+## Responsive Design
+
+The modal is responsive by default:
+- **Desktop**: 900px max-width, centered
+- **Tablet**: 95% width
+- **Mobile**: Full width with adjusted spacing
+
+Custom breakpoint adjustments:
+
+```css
+@media (max-width: 768px) {
+  .telescope-modal {
+    border-radius: 0;
+  }
+
+  .telescope-search-input {
+    font-size: 16px;
+  }
+}
+```

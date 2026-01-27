@@ -6,7 +6,20 @@
   "author": "frostybee",
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./libs/telescope-search": "./src/libs/telescope-search.ts",
+    "./libs/telescope-element": "./src/libs/telescope-element.ts",
+    "./libs/modal": "./src/libs/modal.ts",
+    "./styles/telescope.css": "./src/styles/telescope.css",
+    "./schemas/config": "./src/schemas/config.ts"
+  },
+  "files": [
+    "index.ts",
+    "src/"
+  ],
+  "dependencies": {
+    "fuse.js": "^7.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.37.4",

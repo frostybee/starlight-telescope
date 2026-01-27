@@ -1,0 +1,109 @@
+---
+title: Internationalization
+description: Multi-language support for starlight-telescope.
+---
+
+## Overview
+
+starlight-telescope automatically supports Starlight's multi-language features, providing locale-aware search results without additional configuration.
+
+## How It Works
+
+1. The plugin detects the current locale from the URL path
+2. Fetches page data for that locale (e.g., `/fr/pages.json`)
+3. Filters recent and pinned pages to the current locale
+4. Results only include pages from the active locale
+
+## Locale Detection
+
+The plugin uses path-based locale detection matching Starlight's conventions:
+
+| URL | Detected Locale |
+|-----|-----------------|
+| `/getting-started/` | Default (root) |
+| `/fr/getting-started/` | French |
+| `/es/getting-started/` | Spanish |
+| `/zh-cn/getting-started/` | Chinese (Simplified) |
+
+### Supported Locale Formats
+
+- Two-letter codes: `en`, `fr`, `de`, `es`, `ja`
+- Region codes: `en-us`, `pt-br`, `zh-cn`, `zh-tw`
+
+## Configuration
+
+No additional configuration is needed. The plugin automatically integrates with Starlight's existing locale setup:
+
+```js
+// astro.config.mjs
+starlight({
+  defaultLocale: 'root',
+  locales: {
+    root: { label: 'English', lang: 'en' },
+    fr: { label: 'Français', lang: 'fr' },
+    es: { label: 'Español', lang: 'es' },
+  },
+  plugins: [starlightTelescope()],
+})
+```
+
+## Per-Locale Data Endpoints
+
+Each locale has its own `pages.json` endpoint automatically generated:
+
+| Locale | Endpoint |
+|--------|----------|
+| Default (root) | `/pages.json` |
+| French | `/fr/pages.json` |
+| Spanish | `/es/pages.json` |
+
+These endpoints include only the pages for that specific locale.
+
+## Storage Isolation
+
+Recent and pinned pages are validated per-locale:
+
+- A page pinned in English won't appear when viewing French docs
+- Recently visited English pages won't show in the Spanish locale
+- This prevents confusion when switching between language versions
+
+## Locale-Aware Navigation
+
+When you select a page from search results, the navigation respects the current locale:
+
+- Searching from `/fr/getting-started/` navigates to French pages
+- Searching from `/getting-started/` navigates to default locale pages
+
+## Page Data Structure
+
+Each page in `pages.json` includes:
+
+```json
+{
+  "title": "Getting Started",
+  "path": "/getting-started/",
+  "description": "Install and configure the plugin"
+}
+```
+
+For translated pages:
+
+```json
+{
+  "title": "Commencer",
+  "path": "/fr/getting-started/",
+  "description": "Installer et configurer le plugin"
+}
+```
+
+## Partial Translations
+
+If your documentation is partially translated:
+
+- Users in the French locale only see French pages in search
+- Missing translations won't appear (no fallback to default locale in search)
+- This ensures users only navigate to pages in their selected language
+
+## UI Strings
+
+Currently, the modal UI strings (e.g., "Search pages...", "No results found") are in English. The UI follows browser/system locale where possible, but custom translations would require plugin modification.

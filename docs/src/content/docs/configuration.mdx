@@ -1,0 +1,195 @@
+---
+title: Configuration
+description: Complete reference for all starlight-telescope configuration options.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+All configuration options are optional. The plugin works out of the box with sensible defaults.
+
+## Overview
+
+```js
+// astro.config.mjs
+starlightTelescope({
+  shortcut: { /* keyboard shortcut config */ },
+  fuseOptions: { /* search algorithm config */ },
+  recentPagesCount: 5,
+  debounceMs: 100,
+  theme: { /* color customization */ },
+})
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `shortcut` | `object` | See below | Keyboard shortcut to open modal |
+| `fuseOptions` | `object` | See below | Fuse.js search configuration |
+| `recentPagesCount` | `number` | `5` | Recent pages to display (0-20) |
+| `debounceMs` | `number` | `100` | Search debounce delay (0-1000ms) |
+| `theme` | `object` | `{}` | Theme color overrides |
+
+## `shortcut`
+
+Configure the keyboard shortcut to open the search modal.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `key` | `string` | `'/'` | The key to press |
+| `ctrl` | `boolean` | `true` | Require Ctrl key |
+| `meta` | `boolean` | `true` | Require Meta/Cmd key (Mac) |
+| `shift` | `boolean` | `false` | Require Shift key |
+| `alt` | `boolean` | `false` | Require Alt key |
+
+The default shortcut is **Ctrl+/** on Windows/Linux and **Cmd+/** on Mac.
+
+### Examples
+
+<Tabs>
+<TabItem label="Ctrl+K">
+```js
+shortcut: { key: 'k', ctrl: true, meta: true }
+```
+</TabItem>
+<TabItem label="Ctrl+P">
+```js
+shortcut: { key: 'p', ctrl: true, meta: true }
+```
+</TabItem>
+<TabItem label="Ctrl+Shift+F">
+```js
+shortcut: { key: 'f', ctrl: true, meta: true, shift: true }
+```
+</TabItem>
+</Tabs>
+
+## `fuseOptions`
+
+Configure [Fuse.js](https://fusejs.io/) fuzzy search behavior.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `threshold` | `number` | `0.3` | Match threshold (0 = exact, 1 = match all) |
+| `ignoreLocation` | `boolean` | `false` | Ignore where match occurs in string |
+| `distance` | `number` | `100` | Max distance for fuzzy matches |
+| `minMatchCharLength` | `number` | `1` | Minimum characters to trigger match |
+| `findAllMatches` | `boolean` | `false` | Continue searching after first match |
+| `keys` | `array` | See below | Fields to search with weights |
+
+### Default Keys
+
+```js
+keys: [
+  { name: 'title', weight: 1.0 },
+  { name: 'path', weight: 0.6 },
+  { name: 'description', weight: 0.3 },
+]
+```
+
+### Threshold Values
+
+| Value | Behavior |
+|-------|----------|
+| `0.0` | Exact matches only |
+| `0.3` | Minor typos allowed (default) |
+| `0.5` | Moderate fuzziness |
+| `0.7` | Very lenient matching |
+
+### Example: Prioritize Descriptions
+
+```js
+fuseOptions: {
+  threshold: 0.4,
+  keys: [
+    { name: 'title', weight: 1.0 },
+    { name: 'description', weight: 0.8 },
+    { name: 'path', weight: 0.3 },
+  ],
+}
+```
+
+## `recentPagesCount`
+
+Number of recently visited pages to display. Set to `0` to disable the feature.
+
+```js
+recentPagesCount: 10  // Show last 10 pages
+```
+
+```js
+recentPagesCount: 0   // Disable recent pages
+```
+
+## `debounceMs`
+
+Milliseconds to wait after typing before searching. Higher values reduce CPU usage on slower devices.
+
+```js
+debounceMs: 200  // Wait 200ms after typing stops
+```
+
+## `theme`
+
+Customize colors using CSS color values. All properties are optional.
+
+| Property | CSS Variable | Default |
+|----------|-------------|---------|
+| `overlayBackground` | `--telescope-overlay-bg` | `rgba(1, 4, 9, 0.8)` |
+| `modalBackground` | `--telescope-modal-bg` | `#0d1117` |
+| `modalBackgroundAlt` | `--telescope-modal-bg-alt` | `#010409` |
+| `accentColor` | `--telescope-accent` | `#0969da` |
+| `accentHover` | `--telescope-accent-hover` | `rgba(9, 105, 218, 0.1)` |
+| `accentSelected` | `--telescope-accent-selected` | `rgba(9, 105, 218, 0.15)` |
+| `textPrimary` | `--telescope-text-primary` | `#e6edf3` |
+| `textSecondary` | `--telescope-text-secondary` | `#7d8590` |
+| `border` | `--telescope-border` | `#21262d` |
+| `borderActive` | `--telescope-border-active` | `#30363d` |
+| `pinColor` | `--telescope-pin-color` | `#8250df` |
+| `tagColor` | `--telescope-tag-color` | `#1a7f37` |
+
+### Example: Purple Theme
+
+```js
+theme: {
+  accentColor: '#a855f7',
+  accentHover: 'rgba(168, 85, 247, 0.1)',
+  accentSelected: 'rgba(168, 85, 247, 0.15)',
+  pinColor: '#ec4899',
+}
+```
+
+See the [Styling Guide](/guides/styling/) for more theming options.
+
+## Complete Example
+
+```js
+// astro.config.mjs
+import starlight from '@astrojs/starlight'
+import { defineConfig } from 'astro/config'
+import starlightTelescope from 'starlight-telescope'
+
+export default defineConfig({
+  integrations: [
+    starlight({
+      plugins: [
+        starlightTelescope({
+          shortcut: { key: 'k', ctrl: true, meta: true },
+          fuseOptions: {
+            threshold: 0.4,
+            keys: [
+              { name: 'title', weight: 1.0 },
+              { name: 'description', weight: 0.5 },
+            ],
+          },
+          recentPagesCount: 8,
+          debounceMs: 150,
+          theme: {
+            accentColor: '#7c3aed',
+            pinColor: '#f59e0b',
+          },
+        }),
+      ],
+      title: 'My Docs',
+    }),
+  ],
+})
+```

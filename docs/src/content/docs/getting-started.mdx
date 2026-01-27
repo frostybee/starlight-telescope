@@ -1,8 +1,9 @@
 ---
 title: Getting Started
+description: Install and configure starlight-telescope in your Starlight documentation site.
 ---
 
-Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.
+import { Steps, Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components'
 
 ## Prerequisites
 
@@ -10,8 +11,6 @@ You will need to have a Starlight website set up.
 If you don't have one yet, you can follow the ["Getting Started"](https://starlight.astro.build/getting-started) guide in the Starlight docs to create one.
 
 ## Installation
-
-import { Steps, Tabs, TabItem } from '@astrojs/starlight/components'
 
 <Steps>
 
@@ -66,3 +65,49 @@ import { Steps, Tabs, TabItem } from '@astrojs/starlight/components'
 3. [Start the development server](https://starlight.astro.build/getting-started/#start-the-development-server) to preview the plugin in action.
 
 </Steps>
+
+## Usage
+
+Once installed, press **Ctrl+/** (or **Cmd+/** on Mac) to open the search modal.
+
+### Keyboard Navigation
+
+| Key | Action |
+|-----|--------|
+| **Arrow Down** | Move to next result |
+| **Arrow Up** | Move to previous result |
+| **Enter** | Navigate to selected page |
+| **Space** | Pin/unpin selected page |
+| **Escape** | Close the modal |
+
+### Features
+
+- **Fuzzy Search** — Type to search across all pages by title, path, and description
+- **Recent Pages** — Recently visited pages appear for quick access
+- **Pinned Pages** — Bookmark frequently used pages with Space
+
+## Basic Configuration
+
+Customize the plugin by passing options:
+
+```js
+starlightTelescope({
+  // Use Ctrl+K / Cmd+K instead
+  shortcut: { key: 'k', ctrl: true, meta: true },
+
+  // Show more recent pages
+  recentPagesCount: 10,
+
+  // Adjust search sensitivity
+  fuseOptions: { threshold: 0.4 },
+})
+```
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard title="Configuration" href="/configuration/" description="All configuration options" />
+  <LinkCard title="Keyboard Shortcuts" href="/guides/keyboard-shortcuts/" description="Customize shortcuts" />
+  <LinkCard title="Fuzzy Search" href="/guides/fuzzy-search/" description="Configure search behavior" />
+  <LinkCard title="Styling Guide" href="/guides/styling/" description="Theme customization" />
+</CardGrid>

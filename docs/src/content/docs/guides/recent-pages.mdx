@@ -1,0 +1,70 @@
+---
+title: Recent Pages
+description: Quick access to recently visited documentation pages.
+---
+
+## Overview
+
+starlight-telescope automatically tracks pages you visit and displays them for quick access in the search modal.
+
+## How It Works
+
+1. When you navigate to a page via the search modal, it's added to recent history
+2. Recent pages appear in a dedicated "Recently Visited" section
+3. History is stored in `localStorage` and persists across sessions
+4. Pages are validated against current site content on each load
+
+## Configuration
+
+### Setting the Number of Recent Pages
+
+```js
+starlightTelescope({
+  recentPagesCount: 10  // Show last 10 pages (default: 5)
+})
+```
+
+### Disabling Recent Pages
+
+```js
+starlightTelescope({
+  recentPagesCount: 0  // Disable recent pages tracking
+})
+```
+
+The valid range is 0-20 pages.
+
+## The Recent Tab
+
+The modal includes a dedicated "Recent" tab that shows only your recently visited pages:
+
+1. Press **Ctrl+/** (or **Cmd+/**) to open the modal
+2. Click the **Recent** tab or navigate using keyboard
+3. Your recently visited pages are listed in order
+
+This makes it easy to jump back to pages you've been working with.
+
+## Clearing History
+
+Click the **Clear** button next to "Recently Visited" to remove all recent pages from the list.
+
+## Storage Details
+
+Recent pages are stored in `localStorage` under the key `telescope_recentPages`. Each entry includes:
+
+- Page title
+- Page path
+- Description (if available)
+
+## Multi-Site Behavior
+
+If you use starlight-telescope on multiple Starlight sites that share the same domain (e.g., different documentation versions), recent pages are validated against the current site's content. Pages that don't exist on the current site won't be shown.
+
+## Combining with Pinned Pages
+
+Recent and pinned pages work together:
+- **Pinned pages** appear at the very top (user bookmarks)
+- **Recent pages** appear below pinned (automatic history)
+- **Search results** appear when you type a query
+
+This hierarchy ensures your most important pages are always accessible with minimal typing.

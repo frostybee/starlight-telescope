@@ -17,22 +17,46 @@ editUrl: false
 hero:
   tagline: Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.
   image:
-    html: '🔋'
+    html: '<span style="font-size: 8rem;">🔭</span>'
   actions:
     - text: Get Started
       link: /getting-started/
       icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/frostybee/starlight-telescope
+      icon: external
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components'
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components'
 
-## Next steps
+## Features
 
 <CardGrid stagger>
-  <Card title="Install the plugin" icon="puzzle">
-    Check the [getting started guide](/getting-started/) for installation instructions.
+  <Card title="Fuzzy Search" icon="magnifier">
+    Powered by Fuse.js with configurable threshold, weights, and match highlighting.
   </Card>
-  <Card title="Configure the plugin" icon="setting">
-    Edit your config in the `astro.config.mjs` file.
+  <Card title="Keyboard First" icon="laptop">
+    Open with Ctrl+/ (Cmd+/ on Mac), navigate with arrows, select with Enter.
   </Card>
+  <Card title="Recent Pages" icon="open-book">
+    Automatically tracks recently visited pages for quick access.
+  </Card>
+  <Card title="Pinned Pages" icon="star">
+    Bookmark frequently used pages with a single keypress.
+  </Card>
+  <Card title="Fully Accessible" icon="approve-check-circle">
+    Complete ARIA support, screen reader announcements, and reduced motion support.
+  </Card>
+  <Card title="Customizable Theme" icon="setting">
+    12+ CSS custom properties for complete visual control.
+  </Card>
+</CardGrid>
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard title="Getting Started" href="/getting-started/" description="Install and configure the plugin" />
+  <LinkCard title="Configuration" href="/configuration/" description="Explore all options" />
+  <LinkCard title="Styling Guide" href="/guides/styling/" description="Customize the appearance" />
 </CardGrid>

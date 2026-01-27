@@ -1,0 +1,68 @@
+---
+title: Démarrage
+---
+
+Naviguez rapidement vers n'importe quelle page de votre documentation Starlight grâce à la recherche floue et la navigation au clavier.
+
+## Prérequis
+
+Vous devez avoir un site Starlight configuré.
+Si vous n'en avez pas encore, vous pouvez suivre le guide ["Mise en route"](https://starlight.astro.build/fr/getting-started) dans la documentation Starlight pour en créer un.
+
+## Installation
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components'
+
+<Steps>
+
+1. `starlight-telescope` est un [plugin](https://starlight.astro.build/fr/reference/plugins/) Starlight. Installez-le en exécutant la commande suivante dans votre terminal :
+
+   <Tabs syncKey="pkg">
+
+   <TabItem label="npm">
+
+   ```sh
+   npm install starlight-telescope
+   ```
+
+   </TabItem>
+
+   <TabItem label="pnpm">
+
+   ```sh
+   pnpm add starlight-telescope
+   ```
+
+   </TabItem>
+
+   <TabItem label="Yarn">
+
+   ```sh
+   yarn add starlight-telescope
+   ```
+
+   </TabItem>
+
+   </Tabs>
+
+2. Configurez le plugin dans votre [configuration](https://starlight.astro.build/fr/reference/configuration/#plugins) Starlight dans le fichier `astro.config.mjs`.
+
+   ```diff lang="js"
+   // astro.config.mjs
+   import starlight from '@astrojs/starlight'
+   import { defineConfig } from 'astro/config'
+   +import starlightTelescope from 'starlight-telescope'
+
+   export default defineConfig({
+     integrations: [
+       starlight({
+   +      plugins: [starlightTelescope()],
+         title: 'Ma Documentation',
+       }),
+     ],
+   })
+   ```
+
+3. [Démarrez le serveur de développement](https://starlight.astro.build/fr/getting-started/#start-the-development-server) pour prévisualiser le plugin en action.
+
+</Steps>
