@@ -11,31 +11,52 @@ starlight-telescope uses CSS custom properties for all colors, making it easy to
 
 ### Available Properties
 
+The plugin automatically inherits Starlight's design tokens. You can override any of these:
+
 ```css
 :root {
   /* Overlay/backdrop */
-  --telescope-overlay-bg: rgba(1, 4, 9, 0.8);
+  --telescope-overlay-bg: var(--sl-color-backdrop-overlay);
 
   /* Modal backgrounds */
-  --telescope-modal-bg: #0d1117;
-  --telescope-modal-bg-alt: #010409;
+  --telescope-modal-bg: var(--sl-color-bg-nav);
+  --telescope-modal-bg-alt: var(--sl-color-bg);
 
   /* Accent colors */
-  --telescope-accent: #0969da;
-  --telescope-accent-hover: rgba(9, 105, 218, 0.1);
-  --telescope-accent-selected: rgba(9, 105, 218, 0.15);
+  --telescope-accent: var(--sl-color-accent);
+  --telescope-accent-low: var(--sl-color-accent-low);
+  --telescope-accent-high: var(--sl-color-accent-high);
+  --telescope-accent-hover: color-mix(in srgb, var(--telescope-accent) 10%, transparent);
+  --telescope-accent-selected: color-mix(in srgb, var(--telescope-accent) 18%, transparent);
 
   /* Text colors */
-  --telescope-text-primary: #e6edf3;
-  --telescope-text-secondary: #7d8590;
+  --telescope-text-primary: var(--sl-color-white);
+  --telescope-text-secondary: var(--sl-color-gray-3);
 
   /* Borders */
-  --telescope-border: #21262d;
-  --telescope-border-active: #30363d;
+  --telescope-border: var(--sl-color-hairline-light);
+  --telescope-border-active: var(--sl-color-gray-5);
 
   /* Feature colors */
-  --telescope-pin-color: #8250df;
-  --telescope-tag-color: #1a7f37;
+  --telescope-pin-color: var(--sl-color-purple);
+  --telescope-tag-color: var(--sl-color-green);
+}
+```
+
+## Light and Dark Mode
+
+The plugin inherits Starlight's light/dark mode automatically via CSS variables. Starlight handles `prefers-color-scheme` detection, and telescope inherits those values.
+
+To customize colors per mode:
+
+```css
+:root {
+  --telescope-accent: #7c3aed;
+}
+
+:root[data-theme='light'] {
+  --telescope-accent: #6d28d9;
+  --telescope-modal-bg: #ffffff;
 }
 ```
 
@@ -105,29 +126,38 @@ theme: {
 </TabItem>
 </Tabs>
 
+## Accessibility
+
+When customizing colors, ensure sufficient contrast:
+- **Text on backgrounds:** Minimum 4.5:1 contrast ratio (WCAG AA)
+- **Interactive elements:** Clearly distinguishable focus states
+- **Highlight colors:** Visible against both modal background and text
+
+Use tools like [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to verify your color choices.
+
 ## Customizing Specific Elements
 
 ### Search Input
 
 ```css
-.telescope-search-input {
+.telescope__search-input {
   font-size: 20px;
-  font-family: var(--sl-font);
+  font-family: var(--__sl-font);
 }
 ```
 
 ### Result Items
 
 ```css
-.telescope-result-item {
+.telescope__result-item {
   padding: 16px 24px;
 }
 
-.telescope-result-title {
+.telescope__result-title {
   font-size: 16px;
 }
 
-.telescope-result-description {
+.telescope__result-description {
   font-size: 13px;
 }
 ```
@@ -135,7 +165,7 @@ theme: {
 ### Match Highlighting
 
 ```css
-.telescope-highlight {
+.telescope__highlight {
   background-color: rgba(255, 200, 0, 0.3);
   border-radius: 3px;
 }
@@ -144,11 +174,11 @@ theme: {
 ### Pin Button
 
 ```css
-.telescope-pin-button {
+.telescope__pin-button {
   color: #f59e0b;
 }
 
-.telescope-pin-button.pinned {
+.telescope__pin-button--pinned {
   color: #f59e0b;
   background-color: rgba(245, 158, 11, 0.2);
 }
@@ -156,20 +186,25 @@ theme: {
 
 ## Available CSS Classes
 
+The plugin uses BEM naming convention (`telescope__element--modifier`):
+
 | Class | Element |
 |-------|---------|
-| `.telescope-dialog` | Modal dialog container |
-| `.telescope-modal` | Modal content wrapper |
-| `.telescope-search-input` | Search input field |
-| `.telescope-tabs` | Tab bar container |
-| `.telescope-tab` | Individual tab |
-| `.telescope-result-item` | Search result item |
-| `.telescope-result-title` | Result title |
-| `.telescope-result-description` | Result description |
-| `.telescope-pin-button` | Pin/bookmark button |
-| `.telescope-highlight` | Match highlight |
-| `.telescope-section-separator` | Section header |
-| `.telescope-footer` | Modal footer |
+| `.telescope` | Modal dialog container |
+| `.telescope__modal` | Modal content wrapper |
+| `.telescope__search-input` | Search input field |
+| `.telescope__tabs` | Tab bar container |
+| `.telescope__tab` | Individual tab |
+| `.telescope__tab--active` | Active tab |
+| `.telescope__result-item` | Search result item |
+| `.telescope__result-item--selected` | Selected result item |
+| `.telescope__result-title` | Result title |
+| `.telescope__result-description` | Result description |
+| `.telescope__pin-button` | Pin/bookmark button |
+| `.telescope__pin-button--pinned` | Pinned state |
+| `.telescope__highlight` | Match highlight |
+| `.telescope__section-separator` | Section header |
+| `.telescope__footer` | Modal footer |
 
 ## Reduced Motion
 
@@ -177,8 +212,8 @@ The plugin respects `prefers-reduced-motion`. When users prefer reduced motion, 
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .telescope-dialog[open],
-  .telescope-result-item {
+  .telescope[open],
+  .telescope__result-item {
     animation: none;
     transition: none;
   }
@@ -188,19 +223,18 @@ The plugin respects `prefers-reduced-motion`. When users prefer reduced motion, 
 ## Responsive Design
 
 The modal is responsive by default:
-- **Desktop**: 900px max-width, centered
-- **Tablet**: 95% width
-- **Mobile**: Full width with adjusted spacing
+- **Desktop:** 640px width, centered
+- **Tablet/Mobile:** 95% width with adjusted spacing
 
 Custom breakpoint adjustments:
 
 ```css
 @media (max-width: 768px) {
-  .telescope-modal {
+  .telescope__modal {
     border-radius: 0;
   }
 
-  .telescope-search-input {
+  .telescope__search-input {
     font-size: 16px;
   }
 }

@@ -7,17 +7,19 @@ description: Configure intelligent fuzzy search with Fuse.js.
 
 starlight-telescope uses [Fuse.js](https://fusejs.io/) for fuzzy matching, allowing users to find pages even with typos or partial queries.
 
+All Fuse.js options can be customized. To reset to defaults, remove the `fuseOptions` key from your configuration.
+
 ### Search Ranking
 
 Results are ranked by:
-1. **Exact title matches** — highest priority
-2. **Title prefix matches** — e.g., "get" matches "Getting Started"
-3. **Word-start matches** — e.g., "auth" matches "OAuth Authentication"
-4. **Fuzzy score** — calculated by Fuse.js
+1. **Exact title matches:** highest priority
+2. **Title prefix matches:** e.g., "get" matches "Getting Started"
+3. **Word-start matches:** e.g., "auth" matches "OAuth Authentication"
+4. **Fuzzy score:** calculated by Fuse.js
 
 ### Match Highlighting
 
-Matching text is automatically highlighted in results using the `<mark>` element with the `.telescope-highlight` class.
+Matching text is automatically highlighted in results using the `<mark>` element with the `.telescope__highlight` class.
 
 ## Configuring Search Sensitivity
 
@@ -38,6 +40,11 @@ fuseOptions: {
 | `0.5` | Moderate fuzziness |
 | `0.7` | Very lenient matching |
 
+**Example:** Searching for "geting" (misspelled):
+- At threshold `0.0`: No match for "Getting Started"
+- At threshold `0.3`: Matches "Getting Started" (default)
+- At threshold `0.7`: Also matches "Settings" and other loosely related titles
+
 ### Distance
 
 Controls how far a match can be from the expected position:
@@ -52,15 +59,15 @@ Lower values require matches to be closer to the start of the string.
 
 ### Ignore Location
 
-When `true`, matches anywhere in the string are weighted equally:
+When `true` (default), matches anywhere in the string are weighted equally:
 
 ```js
 fuseOptions: {
-  ignoreLocation: true
+  ignoreLocation: false  // Prefer matches at the start
 }
 ```
 
-This is useful for finding matches in long titles regardless of position.
+Set to `false` if you want matches at the beginning of titles to rank higher.
 
 ## Custom Search Fields
 
@@ -70,6 +77,7 @@ By default, the plugin searches:
 |-------|--------|-------------|
 | `title` | 1.0 | Page title (highest priority) |
 | `path` | 0.6 | URL path |
+| `tags` | 0.5 | Page tags |
 | `description` | 0.3 | Page description |
 
 ### Adjusting Weights
@@ -105,6 +113,15 @@ debounceMs: 200  // Wait 200ms after typing stops
 ```
 
 The default is `100ms`. Higher values are better for slower devices or very large documentation sites.
+
+## Performance Considerations
+
+For large documentation sites (500+ pages):
+- Increase `debounceMs` to 150-200ms to reduce search frequency
+- Consider setting `ignoreLocation: false` for faster matching
+- Higher `threshold` values search more candidates, slightly increasing CPU usage
+
+The default settings work well for most sites up to ~1000 pages.
 
 ## Complete Example
 

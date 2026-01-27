@@ -44,7 +44,7 @@ export default defineConfig({
       social: [
         { href: 'https://github.com/frostybee/starlight-telescope', icon: 'github', label: 'GitHub' },
       ],
-      title: 'starlight-telescope',
+      title: 'Starlight Telescope',
     }),
   ],
 })

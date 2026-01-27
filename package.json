@@ -10,15 +10,16 @@
   },
   "packageManager": "pnpm@10.26.0",
   "private": true,
-  "sideEffects": false,  
-  "dependencies": {
+  "sideEffects": false,
+  "devDependencies": {
     "@changesets/changelog-github": "^0.5.2",
     "@changesets/cli": "^2.29.8"
   },
-    "scripts": {
-    "build": "pnpm -F starlight-telescope build",    
+  "scripts": {
+    "dev": "pnpm -F starlight-telescope-docs dev",
+    "build": "pnpm -F starlight-telescope build",
     "build:docs": "pnpm -F starlight-telescope-docs build",
-    "start:docs": "pnpm -F starlight-telescope-docs start",        
+    "start:docs": "pnpm -F starlight-telescope-docs start",
     "ci-version": "changeset version && pnpm install --no-frozen-lockfile",
     "ci-publish": "pnpm build && changeset publish"
   },

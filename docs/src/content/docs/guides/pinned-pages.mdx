@@ -32,9 +32,11 @@ The pin icon color can be customized using the `pinColor` theme option or the `-
 
 Pinned pages appear in a dedicated section at the top of results:
 
-1. **Pinned Pages** — Your bookmarked pages (manual)
-2. **Recently Visited** — Auto-tracked recent pages
-3. **Search Results** — Filtered results when searching
+1. **Pinned Pages:** Your bookmarked pages (manual)
+2. **Recently Visited:** Auto-tracked recent pages
+3. **Search Results:** Filtered results when searching
+
+Pinned pages appear in the order they were pinned (oldest first).
 
 ## Managing Pins
 
@@ -49,6 +51,15 @@ Press **Space** on a pinned page or click its bookmark icon to unpin it.
 ## Storage
 
 Pinned pages are stored in `localStorage` under `telescope_pinnedPages` and persist across browser sessions.
+
+## Locale Behavior
+
+Pinned pages are locale-aware:
+- Pages pinned while viewing English docs only appear in the English locale
+- Switching to French shows only pages pinned from French docs
+- This prevents mixing languages in your bookmarks
+
+See [Internationalization](/guides/internationalization/) for details.
 
 ## Keyboard Flow Example
 
@@ -83,15 +94,7 @@ starlightTelescope({
   --telescope-pin-color: #ec4899;  /* Pink */
 }
 
-.telescope-pin-button.pinned {
+.telescope__pin-button--pinned {
   background-color: rgba(236, 72, 153, 0.2);
 }
 ```
-
-## Use Cases
-
-Pinned pages are great for:
-- **API Reference** — Quick access to frequently used endpoints
-- **Configuration docs** — Options you check often
-- **Guides** — Tutorials you're working through
-- **Migration docs** — Pages needed during upgrades

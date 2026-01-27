@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "fuse.js": "^7.1.0",
-    "zod": "^3.25.76"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.37.4",
@@ -40,5 +40,14 @@
     "url": "https://github.com/frostybee/starlight-telescope.git",
     "directory": "packages/starlight-telescope"
   },
-  "bugs": "https://github.com/frostybee/starlight-telescope/issues"
+  "bugs": "https://github.com/frostybee/starlight-telescope/issues",
+  "keywords": [
+    "starlight",
+    "starlight-plugin",
+    "astro",
+    "search",
+    "fuzzy-search",
+    "navigation",
+    "command-palette"
+  ]
 }

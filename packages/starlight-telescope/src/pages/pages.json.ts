@@ -42,14 +42,18 @@ export const GET: APIRoute = async ({ params }) => {
       return pageLocale === locale;
     });
 
+    // Filter out the home page (served at /, not /index)
+    const filteredPages = localePages.filter(
+      (page) => stripLocaleFromPath(page.id) !== 'index'
+    );
+
     // Format pages, stripping locale from path since it's already implicit
-    const formattedPages: TelescopePage[] = localePages.map((page) => ({
+    const formattedPages: TelescopePage[] = filteredPages.map((page) => ({
       title: page.data.title,
       // Strip locale prefix from path - navigation will add it back
       path: stripLocaleFromPath(page.id),
       description: page.data.description || '',
       tags: page.data.tags || [],
-      category: page.data.category || '',
     }));
 
     return new Response(JSON.stringify(formattedPages), {

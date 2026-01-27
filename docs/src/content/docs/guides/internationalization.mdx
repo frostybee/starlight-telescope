@@ -7,6 +7,11 @@ description: Multi-language support for starlight-telescope.
 
 starlight-telescope automatically supports Starlight's multi-language features, providing locale-aware search results without additional configuration.
 
+## Current Limitations
+
+- **UI strings are English-only:** Modal text (e.g., "Search pages...", "No results found") is currently hardcoded in English. Custom translations require plugin modification.
+- **No content fallback:** If a page isn't translated, it won't appear in that locale's search results (no fallback to default locale).
+
 ## How It Works
 
 1. The plugin detects the current locale from the URL path
@@ -29,6 +34,10 @@ The plugin uses path-based locale detection matching Starlight's conventions:
 
 - Two-letter codes: `en`, `fr`, `de`, `es`, `ja`
 - Region codes: `en-us`, `pt-br`, `zh-cn`, `zh-tw`
+
+### Fallback Behavior
+
+If a user visits a URL with an unrecognized locale prefix, the plugin falls back to the default locale's page data.
 
 ## Configuration
 
@@ -104,6 +113,3 @@ If your documentation is partially translated:
 - Missing translations won't appear (no fallback to default locale in search)
 - This ensures users only navigate to pages in their selected language
 
-## UI Strings
-
-Currently, the modal UI strings (e.g., "Search pages...", "No results found") are in English. The UI follows browser/system locale where possible, but custom translations would require plugin modification.

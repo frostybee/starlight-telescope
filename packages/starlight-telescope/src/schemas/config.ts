@@ -15,9 +15,9 @@ export const ShortcutSchema = z
 export const FuseOptionsSchema = z
   .object({
     threshold: z.number().min(0).max(1).default(0.3),
-    ignoreLocation: z.boolean().default(false),
+    ignoreLocation: z.boolean().default(true),
     distance: z.number().default(100),
-    minMatchCharLength: z.number().default(1),
+    minMatchCharLength: z.number().default(2),
     findAllMatches: z.boolean().default(false),
     keys: z
       .array(
@@ -29,6 +29,7 @@ export const FuseOptionsSchema = z
       .default([
         { name: 'title', weight: 1.0 },
         { name: 'path', weight: 0.6 },
+        { name: 'tags', weight: 0.5 },
         { name: 'description', weight: 0.3 },
       ]),
   })
@@ -58,6 +59,7 @@ export const TelescopeConfigSchema = z
     shortcut: ShortcutSchema,
     fuseOptions: FuseOptionsSchema,
     recentPagesCount: z.number().min(0).max(20).default(5),
+    maxResults: z.number().min(1).max(100).default(20),
     debounceMs: z.number().min(0).max(1000).default(100),
     theme: ThemeSchema,
   })
@@ -76,5 +78,4 @@ export interface TelescopePage {
   path: string;
   description?: string;
   tags?: string[];
-  category?: string;
 }

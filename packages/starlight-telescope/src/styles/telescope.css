@@ -1,75 +1,112 @@
-/* Telescope Search Modal Styles */
+/* Telescope Search Modal Styles - Starlight Native */
+/* Using BEM naming convention: telescope__element--modifier */
 
-/* CSS Custom Properties for theming */
+/* Map to Starlight's design tokens for automatic theme adaptation */
 :root {
-  --telescope-overlay-bg: rgba(1, 4, 9, 0.8);
-  --telescope-modal-bg: #0d1117;
-  --telescope-modal-bg-alt: #010409;
+  /* Backgrounds - use Starlight's nav/bg colors */
+  --telescope-overlay-bg: var(--sl-color-backdrop-overlay, rgba(1, 4, 9, 0.8));
+  --telescope-modal-bg: var(--sl-color-bg-nav, #161b22);
+  --telescope-modal-bg-alt: var(--sl-color-bg, #0d1117);
+
+  /* Accent - inherits site's configured accent color */
+  --telescope-accent: var(--sl-color-accent, #0969da);
+  --telescope-accent-low: var(--sl-color-accent-low, rgba(9, 105, 218, 0.2));
+  --telescope-accent-high: var(--sl-color-accent-high, #58a6ff);
+
+  /* Text - uses Starlight's text hierarchy */
+  --telescope-text-primary: var(--sl-color-white, #e6edf3);
+  --telescope-text-secondary: var(--sl-color-gray-3, #7d8590);
+
+  /* Borders - uses Starlight's hairline colors */
+  --telescope-border: var(--sl-color-hairline-light, #30363d);
+  --telescope-border-active: var(--sl-color-gray-5, #21262d);
+
+  /* Feature colors - use Starlight semantic colors */
+  --telescope-pin-color: var(--sl-color-purple, #8250df);
+  --telescope-tag-color: var(--sl-color-green, #3fb950);
+
+  /* Hover/selected states with transparency */
+  --telescope-accent-hover: color-mix(in srgb, var(--telescope-accent) 10%, transparent);
+  --telescope-accent-selected: color-mix(in srgb, var(--telescope-accent) 18%, transparent);
+}
+
+/* Light mode overrides - explicit light colors */
+:root[data-theme='light'] {
+  /* Light backgrounds */
+  --telescope-overlay-bg: rgba(175, 184, 193, 0.5);
+  --telescope-modal-bg: #ffffff;
+  --telescope-modal-bg-alt: #f6f8fa;
+
+  /* Dark text for light backgrounds */
+  --telescope-text-primary: #1f2328;
+  --telescope-text-secondary: #57606a;
+
+  /* Borders */
+  --telescope-border: #d0d7de;
+  --telescope-border-active: #afb8c1;
+
+  /* Accent colors - darker for light mode readability */
   --telescope-accent: #0969da;
+  --telescope-accent-high: #0550ae;
+  --telescope-accent-low: #ddf4ff;
   --telescope-accent-hover: rgba(9, 105, 218, 0.1);
   --telescope-accent-selected: rgba(9, 105, 218, 0.15);
-  --telescope-text-primary: #e6edf3;
-  --telescope-text-secondary: #7d8590;
-  --telescope-border: #21262d;
-  --telescope-border-active: #30363d;
+
+  /* Feature colors - darker variants */
   --telescope-pin-color: #8250df;
   --telescope-tag-color: #1a7f37;
 }
 
 /* Trigger Button */
-.telescope-trigger-btn {
+.telescope__trigger-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
   background: none;
   border: none;
-  color: var(--sl-color-gray-3, #7d8590);
+  color: var(--telescope-text-secondary);
   cursor: pointer;
   border-radius: 0.5rem;
 }
 
-.telescope-trigger-btn:hover {
-  color: var(--sl-color-text-accent, #0969da);
-  background: var(--sl-color-gray-6, #21262d);
+.telescope__trigger-btn:hover {
+  color: var(--telescope-accent);
+  background: var(--telescope-accent-hover);
 }
 
-.telescope-shortcut {
+.telescope__shortcut {
   display: none;
   align-items: center;
   gap: 0.125rem;
   margin-inline-start: 0.5rem;
 }
 
-.telescope-shortcut kbd {
-  font-family: var(--sl-font-system-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
-  font-size: var(--sl-text-xs, 0.75rem);
-  background-color: var(--sl-color-gray-6, #21262d);
-  border: 1px solid var(--sl-color-gray-5, #30363d);
+.telescope__shortcut kbd {
+  font-family: var(--__sl-font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: var(--sl-text-xs, 0.8125rem);
+  background-color: var(--telescope-border-active);
+  border: 1px solid var(--telescope-border);
   border-radius: 0.25rem;
   padding: 0.125rem 0.375rem;
-  color: var(--sl-color-gray-2, #c9d1d9);
+  color: var(--telescope-text-secondary);
 }
 
 @media (min-width: 50rem) {
-  .telescope-shortcut.sl-hidden.md\:sl-flex {
+  .telescope__shortcut.sl-hidden.md\:sl-flex {
     display: flex;
   }
 }
 
-/* Animations - defined but only applied when motion is OK */
+/* Animations */
 @keyframes telescopeFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes telescopeSlideIn {
   from {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     opacity: 0;
   }
   to {
@@ -78,38 +115,12 @@
   }
 }
 
-@keyframes telescopeFadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 @keyframes telescopeSpin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-/* Keyboard styling */
-.telescope-modal kbd {
-  background-color: var(--telescope-border);
-  border-radius: 4px;
-  border: 1px solid var(--telescope-border-active);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  color: var(--telescope-text-primary);
-  display: inline-block;
-  font-size: 12px;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  line-height: 1.2;
-  padding: 3px 6px;
-  margin: 0 2px;
-}
-
-/* Dialog Element */
-.telescope-dialog {
+/* Dialog Element (Block) */
+.telescope {
   border: none;
   padding: 0;
   background: transparent;
@@ -120,85 +131,79 @@
   position: fixed;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 8vh;
+  padding-top: 10vh;
   margin: 0;
 }
 
-/* Only show as flex when open - native dialog is display:none when closed */
-.telescope-dialog[open] {
+.telescope[open] {
   display: flex;
 }
 
-.telescope-dialog::backdrop {
+.telescope::backdrop {
   background-color: var(--telescope-overlay-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Apply animations only when user hasn't requested reduced motion */
+/* Motion preferences */
 @media (prefers-reduced-motion: no-preference) {
-  .telescope-dialog[open] {
+  .telescope[open] {
     animation: telescopeFadeIn 0.2s ease-out;
   }
 
-  .telescope-dialog[open]::backdrop {
+  .telescope[open]::backdrop {
     animation: telescopeFadeIn 0.2s ease-out;
   }
 
-  .telescope-dialog[open] .telescope-modal {
+  .telescope[open] .telescope__modal {
     animation: telescopeSlideIn 0.2s ease-out;
   }
 
-  .telescope-trigger-btn,
-  .telescope-result-item,
-  .telescope-close-button,
-  .telescope-tab,
-  .telescope-search-input,
-  .telescope-pin-button,
-  .telescope-clear-btn {
-    transition: all 0.2s ease;
-  }
-
-  .telescope-result-item {
+  .telescope__trigger-btn,
+  .telescope__result-item,
+  .telescope__close-button,
+  .telescope__tab,
+  .telescope__search-input,
+  .telescope__pin-button,
+  .telescope__clear-btn {
     transition: all 0.15s ease;
   }
 
-  .telescope-spinner {
+  .telescope__spinner {
     animation: telescopeSpin 0.8s linear infinite;
   }
 }
 
-/* Remove animations for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .telescope-dialog[open],
-  .telescope-dialog[open]::backdrop,
-  .telescope-dialog[open] .telescope-modal,
-  .telescope-trigger-btn,
-  .telescope-result-item,
-  .telescope-close-button,
-  .telescope-tab,
-  .telescope-search-input,
-  .telescope-pin-button,
-  .telescope-clear-btn {
+  .telescope[open],
+  .telescope[open]::backdrop,
+  .telescope[open] .telescope__modal,
+  .telescope__trigger-btn,
+  .telescope__result-item,
+  .telescope__close-button,
+  .telescope__tab,
+  .telescope__search-input,
+  .telescope__pin-button,
+  .telescope__clear-btn {
     animation: none;
     transition: none;
   }
 
-  .telescope-spinner {
+  .telescope__spinner {
     animation: none;
   }
 }
 
 /* Main Modal */
-.telescope-modal {
-  width: 900px;
+.telescope__modal {
+  font-family: var(--__sl-font, system-ui, sans-serif);
+  width: 640px;
   max-width: 95%;
-  max-height: 85vh;
+  max-height: 80vh;
   background-color: var(--telescope-modal-bg);
-  border-radius: 16px;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(48, 54, 61, 0.5);
+  border-radius: 12px;
+  border: 1px solid var(--telescope-border);
+  box-shadow: var(--sl-shadow-lg, 0 25px 50px -12px rgba(0, 0, 0, 0.5));
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -206,13 +211,13 @@
 }
 
 /* Close Button */
-.telescope-close-button {
+.telescope__close-button {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   background: none;
   border: none;
   color: var(--telescope-text-secondary);
@@ -224,47 +229,47 @@
   padding: 0;
 }
 
-.telescope-close-button svg {
-  width: 20px;
-  height: 20px;
+.telescope__close-button svg {
+  width: 18px;
+  height: 18px;
   stroke: currentColor;
-  stroke-width: 2.5;
+  stroke-width: 2;
   fill: none;
 }
 
-.telescope-close-button:hover {
-  background-color: var(--telescope-border);
-  color: #f85149;
-  transform: scale(1.05);
+.telescope__close-button:hover {
+  background-color: var(--telescope-border-active);
+  color: var(--sl-color-red, #f85149);
 }
 
 /* Tabs */
-.telescope-tabs {
+.telescope__tabs {
   display: flex;
   border-bottom: 1px solid var(--telescope-border);
   background-color: var(--telescope-modal-bg-alt);
-  padding: 0 16px;
+  padding: 0 12px;
 }
 
-.telescope-tab {
-  padding: 14px 20px;
+.telescope__tab {
+  padding: 12px 16px;
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
+  font-family: var(--__sl-font, system-ui, sans-serif);
+  font-size: var(--sl-text-sm, 0.875rem);
   font-weight: 500;
   color: var(--telescope-text-secondary);
   position: relative;
-  border-radius: 8px 8px 0 0;
+  border-radius: 6px 6px 0 0;
   margin: 4px 2px 0;
 }
 
-.telescope-tab:hover {
+.telescope__tab:hover {
   color: var(--telescope-accent);
   background-color: var(--telescope-accent-hover);
 }
 
-.telescope-tab.active {
+.telescope__tab--active {
   color: var(--telescope-accent);
   background-color: var(--telescope-modal-bg);
   border-bottom: 2px solid var(--telescope-accent);
@@ -272,52 +277,50 @@
 }
 
 /* Search Input */
-.telescope-search-input {
+.telescope__search-header {
+  background-color: var(--telescope-modal-bg);
+}
+
+.telescope__search-input {
   width: 100%;
-  padding: 18px 24px;
+  padding: 16px 20px;
   border: none;
   border-radius: 0;
-  font-size: 18px;
+  font-family: var(--__sl-font, system-ui, sans-serif);
+  font-size: var(--sl-text-lg, 1.125rem);
   font-weight: 400;
   background-color: var(--telescope-modal-bg);
   color: var(--telescope-text-primary);
   outline: none;
   margin: 0;
   display: block;
-  letter-spacing: 0.01em;
   line-height: 1.4;
   border-bottom: 1px solid var(--telescope-border);
 }
 
-.telescope-search-input::placeholder {
+.telescope__search-input::placeholder {
   color: var(--telescope-text-secondary);
-  font-weight: 400;
 }
 
-.telescope-search-input:focus {
-  background-color: var(--telescope-modal-bg);
+.telescope__search-input:focus {
   border-bottom-color: var(--telescope-accent);
   box-shadow: 0 1px 0 var(--telescope-accent);
 }
 
 /* Results Container */
-.telescope-results {
-  max-height: 60vh;
+.telescope__results {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 55vh;
   overflow-y: auto;
-  padding: 8px 0;
   background-color: var(--telescope-modal-bg);
 }
 
-.telescope-result-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
 /* Result Items */
-.telescope-result-item {
+.telescope__result-item {
   display: flex;
-  padding: 12px 20px;
+  padding: 10px 16px;
   cursor: pointer;
   border-left: 3px solid transparent;
   align-items: center;
@@ -325,208 +328,223 @@
   position: relative;
 }
 
-.telescope-result-item:hover {
+.telescope__result-item:hover {
   background-color: var(--telescope-accent-hover);
-  border-left-color: rgba(9, 105, 218, 0.4);
+  border-left-color: color-mix(in srgb, var(--telescope-accent) 40%, transparent);
 }
 
-.telescope-result-item.telescope-selected {
+.telescope__result-item--selected {
   background-color: var(--telescope-accent-selected);
   border-left-color: var(--telescope-accent);
 }
 
-.telescope-result-content-row {
+.telescope__result-content-row {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   overflow: hidden;
   min-width: 0;
 }
 
-.telescope-result-title {
+.telescope__result-title {
   font-weight: 600;
-  color: var(--telescope-accent);
-  font-size: 15px;
+  color: var(--telescope-accent-high);
+  font-size: var(--sl-text-sm, 0.875rem);
   line-height: 1.3;
   flex: 0 0 auto;
-  max-width: 35%;
+  max-width: 40%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.telescope-result-description {
-  font-size: 14px;
+.telescope__result-description {
+  font-size: var(--sl-text-sm, 0.875rem);
   color: var(--telescope-text-primary);
   flex: 1;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
-.telescope-result-tags {
+.telescope__result-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   margin-left: 8px;
 }
 
-.telescope-tag {
-  background-color: var(--telescope-border);
-  border-radius: 12px;
+.telescope__tag {
+  background-color: var(--telescope-border-active);
+  border-radius: 10px;
   padding: 2px 8px;
-  font-size: 11px;
+  font-size: var(--sl-text-2xs, 0.75rem);
   color: var(--telescope-tag-color);
   line-height: 1.4;
   font-weight: 500;
 }
 
 /* Pin Button */
-.telescope-pin-button {
+.telescope__pin-button {
   background: none;
   border: none;
   color: var(--telescope-text-secondary);
   cursor: pointer;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-left: 12px;
-  border-radius: 6px;
+  margin-left: 8px;
+  border-radius: 4px;
+  opacity: 0.5;
 }
 
-.telescope-pin-button:hover {
+.telescope__result-item:hover .telescope__pin-button,
+.telescope__result-item--selected .telescope__pin-button {
+  opacity: 1;
+}
+
+.telescope__pin-button:hover {
   color: var(--telescope-pin-color);
-  background-color: rgba(130, 80, 223, 0.15);
-  transform: scale(1.1);
+  background-color: color-mix(in srgb, var(--telescope-pin-color) 15%, transparent);
 }
 
-.telescope-pin-button.pinned {
+.telescope__pin-button--pinned {
   color: var(--telescope-pin-color);
-  background-color: rgba(130, 80, 223, 0.2);
+  background-color: color-mix(in srgb, var(--telescope-pin-color) 20%, transparent);
+  opacity: 1;
 }
 
-.telescope-pin-button svg {
-  width: 16px;
-  height: 16px;
+.telescope__pin-button svg {
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
 /* Section Separators */
-.telescope-section-separator {
-  padding: 8px 20px 6px;
-  font-size: 11px;
-  font-weight: 700;
+.telescope__section-separator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px 6px;
+  font-size: var(--sl-text-2xs, 0.75rem);
+  font-weight: 600;
   color: var(--telescope-text-secondary);
   background-color: var(--telescope-modal-bg-alt);
   border-top: 1px solid var(--telescope-border);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.05em;
 }
 
-.telescope-recent-header {
-  padding: 8px 20px 6px;
-  font-size: 11px;
-  font-weight: 700;
+.telescope__recent-header {
+  padding: 8px 16px 6px;
+  font-size: var(--sl-text-2xs, 0.75rem);
+  font-weight: 600;
   color: var(--telescope-text-secondary);
-  letter-spacing: 0.8px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   background-color: var(--telescope-modal-bg-alt);
   border-bottom: 1px solid var(--telescope-border);
 }
 
-.telescope-recent-section {
-  padding: 0;
-  margin-bottom: 0;
-}
-
 /* No Results */
-.telescope-no-results {
-  padding: 40px 20px;
+.telescope__no-results {
+  padding: 32px 16px;
   text-align: center;
   color: var(--telescope-text-secondary);
+  font-size: var(--sl-text-sm, 0.875rem);
+}
+
+/* More Results Indicator */
+.telescope__more-results {
+  padding: 12px 16px;
+  text-align: center;
+  color: var(--telescope-text-secondary);
+  font-size: var(--sl-text-xs, 0.8125rem);
   font-style: italic;
-  font-size: 15px;
+  background-color: var(--telescope-modal-bg-alt);
+  border-top: 1px solid var(--telescope-border);
 }
 
 /* Footer */
-.telescope-footer {
-  padding: 12px 20px;
+.telescope__footer {
+  padding: 10px 16px;
   border-top: 1px solid var(--telescope-border);
   background-color: var(--telescope-modal-bg-alt);
 }
 
-.telescope-shortcuts {
+.telescope__shortcuts {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  font-size: 13px;
+  gap: 16px;
+  font-size: var(--sl-text-xs, 0.8125rem);
   color: var(--telescope-text-secondary);
 }
 
-.telescope-shortcuts span {
+.telescope__shortcuts span {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+}
+
+/* Keyboard styling */
+.telescope__modal kbd {
+  font-family: var(--__sl-font-mono, ui-monospace, monospace);
+  font-size: var(--sl-text-2xs, 0.75rem);
+  background-color: var(--telescope-border-active);
+  border: 1px solid var(--telescope-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--telescope-modal-bg-alt);
+  color: var(--telescope-text-primary);
+  display: inline-block;
+  line-height: 1.2;
+  padding: 2px 5px;
+  margin: 0 1px;
 }
 
 /* Sections */
-.telescope-section {
+.telescope__section {
   display: none;
   flex: 1;
   overflow-y: auto;
   background-color: var(--telescope-modal-bg);
   scrollbar-width: thin;
-  scrollbar-color: var(--telescope-border-active) var(--telescope-border);
+  scrollbar-color: var(--telescope-border) var(--telescope-modal-bg);
 }
 
-.telescope-section.active {
+.telescope__section--active {
   display: block;
 }
 
 /* Custom Scrollbars */
-.telescope-results::-webkit-scrollbar,
-.telescope-section::-webkit-scrollbar {
-  width: 8px;
+.telescope__results::-webkit-scrollbar,
+.telescope__section::-webkit-scrollbar {
+  width: 6px;
 }
 
-.telescope-results::-webkit-scrollbar-track,
-.telescope-section::-webkit-scrollbar-track {
+.telescope__results::-webkit-scrollbar-track,
+.telescope__section::-webkit-scrollbar-track {
+  background: var(--telescope-modal-bg);
+}
+
+.telescope__results::-webkit-scrollbar-thumb,
+.telescope__section::-webkit-scrollbar-thumb {
   background: var(--telescope-border);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
-.telescope-results::-webkit-scrollbar-thumb,
-.telescope-section::-webkit-scrollbar-thumb {
-  background: var(--telescope-border-active);
-  border-radius: 4px;
-  border: 1px solid var(--telescope-border);
+.telescope__results::-webkit-scrollbar-thumb:hover,
+.telescope__section::-webkit-scrollbar-thumb:hover {
+  background: var(--telescope-text-secondary);
 }
 
-.telescope-results::-webkit-scrollbar-thumb:hover,
-.telescope-section::-webkit-scrollbar-thumb:hover {
-  background: var(--telescope-accent);
-}
-
-/* Firefox Scrollbars */
-.telescope-results,
-.telescope-section {
-  scrollbar-width: thin;
-  scrollbar-color: var(--telescope-border-active) var(--telescope-border);
-}
-
-/* Hide cursor utility */
-.hide-cursor {
-  cursor: none;
-}
-
-/* Screen reader only - visually hidden but accessible */
+/* Screen reader only */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -540,85 +558,85 @@
 }
 
 /* Loading Indicator */
-.telescope-loading {
+.telescope__loading {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 3rem;
+  padding: 2.5rem;
   color: var(--telescope-text-secondary);
-  font-size: 14px;
+  font-size: var(--sl-text-sm, 0.875rem);
 }
 
-.telescope-spinner {
-  width: 20px;
-  height: 20px;
+.telescope__spinner {
+  width: 18px;
+  height: 18px;
   border: 2px solid var(--telescope-border);
   border-top-color: var(--telescope-accent);
   border-radius: 50%;
 }
 
 /* Search Result Highlighting */
-.telescope-highlight {
-  background-color: rgba(9, 105, 218, 0.3);
+.telescope__highlight {
+  background-color: rgba(250, 204, 21, 0.4);
   color: var(--telescope-text-primary);
   border-radius: 2px;
   padding: 0 2px;
 }
 
-/* Clear History Button */
-.telescope-section-separator {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.telescope-clear-btn {
+/* Clear Button */
+.telescope__clear-btn {
   background: transparent;
   border: none;
   color: var(--telescope-text-secondary);
-  font-size: 11px;
+  font-size: var(--sl-text-2xs, 0.75rem);
   font-weight: 500;
   cursor: pointer;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   text-transform: none;
   letter-spacing: normal;
 }
 
-.telescope-clear-btn:hover {
+.telescope__clear-btn:hover {
   color: var(--telescope-accent);
-  background: var(--telescope-border);
+  background: var(--telescope-accent-hover);
+}
+
+/* Hide cursor utility */
+.hide-cursor {
+  cursor: none;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .telescope-dialog {
-    padding-top: 4vh;
+@media (max-width: 50rem) {
+  .telescope {
+    padding-top: 5vh;
   }
 
-  .telescope-modal {
+  .telescope__modal {
     width: 100%;
     max-width: 100%;
     max-height: 90vh;
-    border-radius: 12px;
+    border-radius: 10px;
   }
 
-  .telescope-search-input {
-    font-size: 16px;
-    padding: 16px 20px;
+  .telescope__search-input {
+    font-size: 16px; /* Prevent iOS zoom */
+    padding: 14px 16px;
   }
 
-  .telescope-result-content-row {
-    gap: 12px;
+  .telescope__result-content-row {
+    gap: 10px;
   }
 
-  .telescope-result-title {
-    max-width: 40%;
-    font-size: 14px;
+  .telescope__result-title {
+    max-width: 45%;
   }
 
-  .telescope-result-description {
-    font-size: 13px;
+  .telescope__shortcuts {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

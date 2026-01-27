@@ -33,6 +33,13 @@ export default class TelescopeSearch {
   private tabs: NodeListOf<HTMLElement>;
   private closeButton: HTMLElement | null;
 
+  private getActiveResultsContainer(): HTMLElement | null {
+    if (this.currentTab === 'recent') {
+      return this.recentResultsContainerElement;
+    }
+    return this.resultsContainerElement;
+  }
+
   constructor(config: TelescopeConfig) {
     this.config = config;
     this.recentPages = this.loadRecentPages();
@@ -46,7 +53,7 @@ export default class TelescopeSearch {
     ) as HTMLInputElement | null;
     this.resultsContainerElement = document.getElementById('telescope-results');
     this.recentResultsContainerElement = document.getElementById('telescope-recent-results');
-    this.tabs = document.querySelectorAll('.telescope-tab');
+    this.tabs = document.querySelectorAll('.telescope__tab');
     this.closeButton = document.getElementById('telescope-close-button');
 
     // Bind methods
@@ -239,7 +246,7 @@ export default class TelescopeSearch {
         result += this.escapeHtml(text.slice(lastIndex, start));
       }
       if (start >= lastIndex) {
-        result += `<mark class="telescope-highlight">${this.escapeHtml(text.slice(start, end + 1))}</mark>`;
+        result += `<mark class="telescope__highlight">${this.escapeHtml(text.slice(start, end + 1))}</mark>`;
         lastIndex = end + 1;
       }
     }
@@ -339,7 +346,7 @@ export default class TelescopeSearch {
 
   private togglePinForSelectedItem(): void {
     // Get the currently selected item from the DOM
-    const selectedItem = document.querySelector('.telescope-result-item.telescope-selected');
+    const selectedItem = document.querySelector('.telescope__result-item--selected');
 
     if (selectedItem && selectedItem.hasAttribute('data-path')) {
       const path = selectedItem.getAttribute('data-path');
@@ -411,7 +418,7 @@ export default class TelescopeSearch {
       }
 
       // Tab clicked
-      const tab = target.closest('.telescope-tab') as HTMLElement;
+      const tab = target.closest('.telescope__tab') as HTMLElement;
       if (tab?.dataset.tab) {
         this.switchTab(tab.dataset.tab as 'search' | 'recent');
         return;
@@ -498,29 +505,11 @@ export default class TelescopeSearch {
   }
 
   private navigateResults(direction: number): void {
-    // Use validated pages to ensure correct counts
-    const validatedPinned = this.validateStoredPages(this.pinnedPages);
-    const validatedRecent = this.validateStoredPages(this.recentPages);
+    const container = this.getActiveResultsContainer();
+    if (!container) return;
 
-    // Account for all items in the search view
-    const pinnedCount = this.currentTab === 'search' ? validatedPinned.length : 0;
-    const recentCount =
-      this.currentTab === 'search'
-        ? Math.min(validatedRecent.filter((p) => !this.isPagePinned(p.path)).length, this.config.recentPagesCount)
-        : 0;
-
-    // Use the same filtering approach as in renderSearchResults and selectCurrentItem
-    const pinnedPaths = validatedPinned.map((p) => p.path);
-    const recentPaths = validatedRecent.map((p) => p.path);
-    const searchCount =
-      this.currentTab === 'search'
-        ? this.filteredPages.filter(
-            (p) => !pinnedPaths.includes(p.path) && !recentPaths.includes(p.path)
-          ).length
-        : this.filteredPages.length;
-
-    const totalItems = pinnedCount + recentCount + searchCount;
-
+    // Count actual rendered items - single source of truth
+    const totalItems = container.querySelectorAll('.telescope__result-item').length;
     if (totalItems === 0) return;
 
     if (direction > 0) {
@@ -547,7 +536,9 @@ export default class TelescopeSearch {
             page.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
       );
       this.filteredPages = filteredRecent;
+      this.selectedIndex = 0;
       this.renderRecentResults();
+      this.updateSelectedResult();
     } else {
       // Filter all pages
       this.filterPages();
@@ -613,6 +604,7 @@ export default class TelescopeSearch {
 
     this.selectedIndex = 0;
     this.renderResults();
+    this.updateSelectedResult();
 
     // Announce result count for screen readers
     const count = this.filteredPages.length;
@@ -620,17 +612,20 @@ export default class TelescopeSearch {
   }
 
   private updateSelectedResult(): void {
-    // Remove selection from all items
-    const items = document.querySelectorAll('.telescope-result-item');
+    const container = this.getActiveResultsContainer();
+    if (!container) return;
+
+    // Remove selection from all items in the active container
+    const items = container.querySelectorAll('.telescope__result-item');
     items.forEach((item) => {
-      item.classList.remove('telescope-selected');
+      item.classList.remove('telescope__result-item--selected');
       item.setAttribute('aria-selected', 'false');
     });
 
-    // Add selection to current item
-    const selectedItem = document.querySelector(`[data-index="${this.selectedIndex}"]`);
+    // Add selection to current item within the active container
+    const selectedItem = container.querySelector(`[data-index="${this.selectedIndex}"]`);
     if (selectedItem) {
-      selectedItem.classList.add('telescope-selected');
+      selectedItem.classList.add('telescope__result-item--selected');
       selectedItem.setAttribute('aria-selected', 'true');
 
       // Update aria-activedescendant on the input
@@ -728,6 +723,9 @@ export default class TelescopeSearch {
     // Clear current results
     this.resultsContainerElement.innerHTML = '';
 
+    // Use a running index counter for sequential indexing
+    let currentIndex = 0;
+
     // Use validated pages to prevent showing pages from other sites
     const validatedRecent = this.validateStoredPages(this.recentPages);
 
@@ -737,27 +735,43 @@ export default class TelescopeSearch {
         this.createSectionHeader('Recently Visited', () => this.clearRecentPages())
       );
 
-      validatedRecent.forEach((page, index) => {
-        const listItem = this.createResultItem(page, index);
+      validatedRecent.forEach((page) => {
+        const listItem = this.createResultItem(page, currentIndex);
         this.resultsContainerElement!.appendChild(listItem);
+        currentIndex++;
       });
     }
 
     if (this.filteredPages.length === 0) {
       // Show no results message
       const noResults = document.createElement('li');
-      noResults.className = 'telescope-no-results';
+      noResults.className = 'telescope__no-results';
       noResults.setAttribute('role', 'presentation');
       noResults.textContent = 'No pages found matching your search';
       this.resultsContainerElement.appendChild(noResults);
       return;
     }
 
+    // Limit results to maxResults for performance
+    const maxResults = this.config.maxResults;
+    const hasMoreResults = this.filteredPages.length > maxResults;
+    const displayResults = this.filteredPages.slice(0, maxResults);
+
     // Append items directly to the ul (no nested ul)
-    this.filteredPages.forEach((page, index) => {
-      const listItem = this.createResultItem(page, index);
+    displayResults.forEach((page) => {
+      const listItem = this.createResultItem(page, currentIndex);
       this.resultsContainerElement!.appendChild(listItem);
+      currentIndex++;
     });
+
+    // Show indicator when results are truncated
+    if (hasMoreResults) {
+      const indicator = document.createElement('li');
+      indicator.className = 'telescope__more-results';
+      indicator.setAttribute('role', 'presentation');
+      indicator.textContent = `Showing ${maxResults} of ${this.filteredPages.length} results. Refine your search to see more.`;
+      this.resultsContainerElement!.appendChild(indicator);
+    }
   }
 
   private createResultItem(page: TelescopePage, index: number): HTMLLIElement {
@@ -765,7 +779,7 @@ export default class TelescopeSearch {
     const itemId = `telescope-option-${index}`;
 
     listItem.id = itemId;
-    listItem.className = `telescope-result-item ${index === this.selectedIndex ? 'telescope-selected' : ''}`;
+    listItem.className = `telescope__result-item${index === this.selectedIndex ? ' telescope__result-item--selected' : ''}`;
     listItem.setAttribute('role', 'option');
     listItem.setAttribute('aria-selected', index === this.selectedIndex ? 'true' : 'false');
     listItem.setAttribute('data-index', String(index));
@@ -774,7 +788,7 @@ export default class TelescopeSearch {
     // Add pin button
     const isPinned = this.isPagePinned(page.path);
     const pinButton = document.createElement('button');
-    pinButton.className = `telescope-pin-button ${isPinned ? 'pinned' : ''}`;
+    pinButton.className = `telescope__pin-button${isPinned ? ' telescope__pin-button--pinned' : ''}`;
     pinButton.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"></path>
                 </svg>`;
@@ -798,14 +812,14 @@ export default class TelescopeSearch {
 
     // Single row content
     const contentRow = document.createElement('div');
-    contentRow.className = 'telescope-result-content-row';
+    contentRow.className = 'telescope__result-content-row';
 
     // Get matches for highlighting (only if there's an active search query)
     const matches = this.searchQuery.trim() ? this.getMatchesForPage(page) : undefined;
 
     // Title (with highlighting if matches exist)
     const titleDiv = document.createElement('div');
-    titleDiv.className = 'telescope-result-title';
+    titleDiv.className = 'telescope__result-title';
     titleDiv.innerHTML = this.highlightMatches(page.title || '', matches, 'title');
 
     contentRow.appendChild(titleDiv);
@@ -813,7 +827,7 @@ export default class TelescopeSearch {
     // Description (if available, with highlighting if matches exist)
     if (page.description) {
       const descriptionDiv = document.createElement('div');
-      descriptionDiv.className = 'telescope-result-description';
+      descriptionDiv.className = 'telescope__result-description';
       descriptionDiv.innerHTML = this.highlightMatches(page.description, matches, 'description');
       contentRow.appendChild(descriptionDiv);
     }
@@ -821,11 +835,11 @@ export default class TelescopeSearch {
     // Tags (if available)
     if (page.tags && page.tags.length > 0) {
       const tagsDiv = document.createElement('div');
-      tagsDiv.className = 'telescope-result-tags';
+      tagsDiv.className = 'telescope__result-tags';
 
       page.tags.forEach((tag) => {
         const tagSpan = document.createElement('span');
-        tagSpan.className = 'telescope-tag';
+        tagSpan.className = 'telescope__tag';
         tagSpan.textContent = tag;
         tagsDiv.appendChild(tagSpan);
       });
@@ -852,15 +866,17 @@ export default class TelescopeSearch {
 
   private switchTab(tabName: 'search' | 'recent'): void {
     this.currentTab = tabName;
+    this.selectedIndex = 0;
 
     // Update tab buttons
     this.tabs.forEach((tab) => {
-      tab.classList.toggle('active', tab.dataset.tab === tabName);
+      const isActive = tab.dataset.tab === tabName;
+      tab.classList.toggle('telescope__tab--active', isActive);
     });
 
     // Update sections
-    document.querySelectorAll('.telescope-section').forEach((section) => {
-      section.classList.toggle('active', section.id === `telescope-${tabName}-section`);
+    document.querySelectorAll('.telescope__section').forEach((section) => {
+      section.classList.toggle('telescope__section--active', section.id === `telescope-${tabName}-section`);
     });
 
     // Update search input placeholder
@@ -875,6 +891,9 @@ export default class TelescopeSearch {
     } else {
       this.renderSearchResults();
     }
+
+    // Update selection after rendering
+    this.updateSelectedResult();
   }
 
   private renderRecentResults(): void {
@@ -882,20 +901,24 @@ export default class TelescopeSearch {
 
     this.recentResultsContainerElement.innerHTML = '';
 
-    // Use validated pages to prevent showing pages from other sites
-    const validatedRecent = this.validateStoredPages(this.recentPages);
+    // Use filtered pages if there's a search query, otherwise show all validated recent pages
+    const pagesToRender = this.searchQuery.trim()
+      ? this.filteredPages
+      : this.validateStoredPages(this.recentPages);
 
-    if (validatedRecent.length === 0) {
+    if (pagesToRender.length === 0) {
       const noResults = document.createElement('li');
-      noResults.className = 'telescope-no-results';
+      noResults.className = 'telescope__no-results';
       noResults.setAttribute('role', 'presentation');
-      noResults.textContent = 'No recently visited pages';
+      noResults.textContent = this.searchQuery.trim()
+        ? 'No pages found matching your search'
+        : 'No recently visited pages';
       this.recentResultsContainerElement.appendChild(noResults);
       return;
     }
 
     // Append items directly to the ul (no nested ul)
-    validatedRecent.forEach((page, index) => {
+    pagesToRender.forEach((page, index) => {
       const listItem = this.createResultItem(page, index);
       this.recentResultsContainerElement!.appendChild(listItem);
     });
@@ -903,7 +926,7 @@ export default class TelescopeSearch {
 
   private createSectionHeader(text: string, onClear?: () => void): HTMLLIElement {
     const header = document.createElement('li');
-    header.className = 'telescope-section-separator';
+    header.className = 'telescope__section-separator';
     header.setAttribute('role', 'presentation');
 
     const title = document.createElement('span');
@@ -912,7 +935,7 @@ export default class TelescopeSearch {
 
     if (onClear) {
       const clearBtn = document.createElement('button');
-      clearBtn.className = 'telescope-clear-btn';
+      clearBtn.className = 'telescope__clear-btn';
       clearBtn.textContent = 'Clear';
       clearBtn.setAttribute('aria-label', `Clear ${text.toLowerCase()}`);
       clearBtn.addEventListener('click', (e) => {
@@ -978,7 +1001,7 @@ export default class TelescopeSearch {
     // Show search results or no results message
     if (filteredResults.length === 0 && validatedPinned.length === 0 && validatedRecent.length === 0) {
       const noResults = document.createElement('li');
-      noResults.className = 'telescope-no-results';
+      noResults.className = 'telescope__no-results';
       noResults.setAttribute('role', 'presentation');
       noResults.textContent = 'No pages found matching your search';
       this.resultsContainerElement.appendChild(noResults);
@@ -991,16 +1014,30 @@ export default class TelescopeSearch {
       this.config.recentPagesCount
     );
 
-    filteredResults.forEach((page, index) => {
+    // Limit results to maxResults for performance
+    const maxResults = this.config.maxResults;
+    const hasMoreResults = filteredResults.length > maxResults;
+    const displayResults = filteredResults.slice(0, maxResults);
+
+    displayResults.forEach((page, index) => {
       const realIndex = pinnedCount + recentCount + index;
       const listItem = this.createResultItem(page, realIndex);
       this.resultsContainerElement!.appendChild(listItem);
     });
+
+    // Show indicator when results are truncated
+    if (hasMoreResults) {
+      const indicator = document.createElement('li');
+      indicator.className = 'telescope__more-results';
+      indicator.setAttribute('role', 'presentation');
+      indicator.textContent = `Showing ${maxResults} of ${filteredResults.length} results. Refine your search to see more.`;
+      this.resultsContainerElement!.appendChild(indicator);
+    }
   }
 
   private selectCurrentItem(): void {
     // Get the currently selected item directly from the DOM
-    const selectedItem = document.querySelector('.telescope-result-item.telescope-selected');
+    const selectedItem = document.querySelector('.telescope__result-item--selected');
 
     if (selectedItem && selectedItem.hasAttribute('data-path')) {
       // Navigate to the page using the path stored in the data-path attribute

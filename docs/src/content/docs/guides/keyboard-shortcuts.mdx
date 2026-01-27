@@ -49,6 +49,18 @@ starlightTelescope({
 })
 ```
 
+### Avoiding Browser Conflicts
+
+Some shortcuts conflict with browser or OS defaults:
+
+| Shortcut | Conflict |
+|----------|----------|
+| **Ctrl+K** | Browser address bar (Chrome), Command palette (VS Code) |
+| **Ctrl+P** | Print dialog (all browsers) |
+| **Ctrl+F** | Browser find |
+
+The default **Ctrl+/** is chosen because it has minimal conflicts. If you customize the shortcut, test across browsers your users are likely to use.
+
 ## Shortcut Options
 
 | Property | Type | Default | Description |
@@ -83,6 +95,12 @@ Next time:
 
 All keyboard interactions are accessible:
 - **ARIA live regions** announce navigation changes to screen readers
-- **Focus management** — focus moves to search input when modal opens
-- **Tab trapping** — focus stays within modal while open
-- **Reduced motion** — animations respect `prefers-reduced-motion`
+- **Focus management:** focus moves to search input when modal opens
+- **Tab trapping:** focus stays within modal while open
+- **Reduced motion:** animations respect `prefers-reduced-motion`
+
+For more on keyboard accessibility, see [WCAG 2.1 Keyboard Accessible guidelines](https://www.w3.org/WAI/WCAG21/Understanding/keyboard-accessible).
+
+### Mobile Support
+
+On mobile devices, the search modal is opened via the visual trigger button since keyboard shortcuts aren't available. All touch interactions are fully supported.

@@ -14,6 +14,8 @@ starlight-telescope automatically tracks pages you visit and displays them for q
 3. History is stored in `localStorage` and persists across sessions
 4. Pages are validated against current site content on each load
 
+Recent pages appear with the most recently visited at the top.
+
 ## Configuration
 
 ### Setting the Number of Recent Pages
@@ -52,13 +54,30 @@ Click the **Clear** button next to "Recently Visited" to remove all recent pages
 
 Recent pages are stored in `localStorage` under the key `telescope_recentPages`. Each entry includes:
 
-- Page title
+- Page title (captured at visit time)
 - Page path
 - Description (if available)
+
+Entries are stored in most-recent-first order.
 
 ## Multi-Site Behavior
 
 If you use starlight-telescope on multiple Starlight sites that share the same domain (e.g., different documentation versions), recent pages are validated against the current site's content. Pages that don't exist on the current site won't be shown.
+
+## Locale Behavior
+
+Recent pages are locale-aware:
+- Pages visited in English only appear in the English locale's recent list
+- Switching to French shows only French pages you've visited
+- This matches the behavior of pinned pages
+
+See [Internationalization](/guides/internationalization/) for details.
+
+## Edge Cases
+
+- **Deleted pages:** If a recently visited page is removed from documentation, it won't appear in the recent list (validated against current site content).
+- **Title changes:** Recent pages store the title at visit time. If a page's title changes, the stored title remains until the page is visited again.
+- **URL changes:** If a page's URL changes, the old entry becomes invalid.
 
 ## Combining with Pinned Pages
 

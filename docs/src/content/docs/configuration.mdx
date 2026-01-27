@@ -15,6 +15,7 @@ starlightTelescope({
   shortcut: { /* keyboard shortcut config */ },
   fuseOptions: { /* search algorithm config */ },
   recentPagesCount: 5,
+  maxResults: 20,
   debounceMs: 100,
   theme: { /* color customization */ },
 })
@@ -25,6 +26,7 @@ starlightTelescope({
 | `shortcut` | `object` | See below | Keyboard shortcut to open modal |
 | `fuseOptions` | `object` | See below | Fuse.js search configuration |
 | `recentPagesCount` | `number` | `5` | Recent pages to display (0-20) |
+| `maxResults` | `number` | `20` | Maximum search results to display (1-100) |
 | `debounceMs` | `number` | `100` | Search debounce delay (0-1000ms) |
 | `theme` | `object` | `{}` | Theme color overrides |
 
@@ -69,9 +71,9 @@ Configure [Fuse.js](https://fusejs.io/) fuzzy search behavior.
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `threshold` | `number` | `0.3` | Match threshold (0 = exact, 1 = match all) |
-| `ignoreLocation` | `boolean` | `false` | Ignore where match occurs in string |
+| `ignoreLocation` | `boolean` | `true` | Ignore where match occurs in string |
 | `distance` | `number` | `100` | Max distance for fuzzy matches |
-| `minMatchCharLength` | `number` | `1` | Minimum characters to trigger match |
+| `minMatchCharLength` | `number` | `2` | Minimum characters to trigger match |
 | `findAllMatches` | `boolean` | `false` | Continue searching after first match |
 | `keys` | `array` | See below | Fields to search with weights |
 
@@ -81,6 +83,7 @@ Configure [Fuse.js](https://fusejs.io/) fuzzy search behavior.
 keys: [
   { name: 'title', weight: 1.0 },
   { name: 'path', weight: 0.6 },
+  { name: 'tags', weight: 0.5 },
   { name: 'description', weight: 0.3 },
 ]
 ```
@@ -119,6 +122,18 @@ recentPagesCount: 10  // Show last 10 pages
 recentPagesCount: 0   // Disable recent pages
 ```
 
+## `maxResults`
+
+Maximum number of search results to display at once. This improves performance on large documentation sites by limiting DOM rendering. When there are more results than the limit, a message indicates how many total results were found.
+
+```js
+maxResults: 30  // Show up to 30 results
+```
+
+```js
+maxResults: 50  // For larger monitors or power users
+```
+
 ## `debounceMs`
 
 Milliseconds to wait after typing before searching. Higher values reduce CPU usage on slower devices.
@@ -129,22 +144,22 @@ debounceMs: 200  // Wait 200ms after typing stops
 
 ## `theme`
 
-Customize colors using CSS color values. All properties are optional.
+Customize colors using CSS color values. All properties are optional and inherit from Starlight's design tokens by default.
 
-| Property | CSS Variable | Default |
-|----------|-------------|---------|
-| `overlayBackground` | `--telescope-overlay-bg` | `rgba(1, 4, 9, 0.8)` |
-| `modalBackground` | `--telescope-modal-bg` | `#0d1117` |
-| `modalBackgroundAlt` | `--telescope-modal-bg-alt` | `#010409` |
-| `accentColor` | `--telescope-accent` | `#0969da` |
-| `accentHover` | `--telescope-accent-hover` | `rgba(9, 105, 218, 0.1)` |
-| `accentSelected` | `--telescope-accent-selected` | `rgba(9, 105, 218, 0.15)` |
-| `textPrimary` | `--telescope-text-primary` | `#e6edf3` |
-| `textSecondary` | `--telescope-text-secondary` | `#7d8590` |
-| `border` | `--telescope-border` | `#21262d` |
-| `borderActive` | `--telescope-border-active` | `#30363d` |
-| `pinColor` | `--telescope-pin-color` | `#8250df` |
-| `tagColor` | `--telescope-tag-color` | `#1a7f37` |
+| Property | CSS Variable | Inherits From |
+|----------|-------------|---------------|
+| `overlayBackground` | `--telescope-overlay-bg` | `--sl-color-backdrop-overlay` |
+| `modalBackground` | `--telescope-modal-bg` | `--sl-color-bg-nav` |
+| `modalBackgroundAlt` | `--telescope-modal-bg-alt` | `--sl-color-bg` |
+| `accentColor` | `--telescope-accent` | `--sl-color-accent` |
+| `accentHover` | `--telescope-accent-hover` | Derived from accent |
+| `accentSelected` | `--telescope-accent-selected` | Derived from accent |
+| `textPrimary` | `--telescope-text-primary` | `--sl-color-white` |
+| `textSecondary` | `--telescope-text-secondary` | `--sl-color-gray-3` |
+| `border` | `--telescope-border` | `--sl-color-hairline-light` |
+| `borderActive` | `--telescope-border-active` | `--sl-color-gray-5` |
+| `pinColor` | `--telescope-pin-color` | `--sl-color-purple` |
+| `tagColor` | `--telescope-tag-color` | `--sl-color-green` |
 
 ### Example: Purple Theme
 
@@ -181,6 +196,7 @@ export default defineConfig({
             ],
           },
           recentPagesCount: 8,
+          maxResults: 25,
           debounceMs: 150,
           theme: {
             accentColor: '#7c3aed',
