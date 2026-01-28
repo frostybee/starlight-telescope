@@ -1,6 +1,8 @@
 import type { AstroIntegration } from 'astro';
 import type { TelescopeConfig } from '../schemas/config.js';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { vitePluginTelescopeConfig } from './vite.js';
 
 export default function starlightTelescopeIntegration(
@@ -23,8 +25,19 @@ export default function starlightTelescopeIntegration(
           entrypoint: fileURLToPath(new URL('../pages/pages.json.ts', import.meta.url)),
         });
 
-        // 3. Inject CSS
-        injectScript('page', `import 'starlight-telescope/styles/telescope.css';`);
+        // 3. Inject CSS by reading file and adding style tag
+        const currentDir = dirname(fileURLToPath(import.meta.url));
+        const cssPath = join(currentDir, '..', 'styles', 'telescope.css');
+        const cssContent = readFileSync(cssPath, 'utf-8');
+
+        injectScript('page', `
+          if (!document.getElementById('telescope-styles')) {
+            const style = document.createElement('style');
+            style.id = 'telescope-styles';
+            style.textContent = ${JSON.stringify(cssContent)};
+            document.head.appendChild(style);
+          }
+        `);
 
         // 4. Inject client-side script with custom element
         // Use base64 encoding for safe config transport (avoids XSS via string escaping)
