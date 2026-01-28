@@ -1,6 +1,7 @@
 import starlight from '@astrojs/starlight'
 import { defineConfig } from 'astro/config'
 import starlightTelescope from 'starlight-telescope'
+import starlightLinksValidator from 'starlight-links-validator'
 
 export default defineConfig({
   site: 'https://frostybee.github.io',
@@ -23,7 +24,13 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/frostybee/starlight-telescope/edit/main/docs/',
       },
-      plugins: [starlightTelescope()],
+      plugins: [
+        starlightTelescope(), 
+        starlightLinksValidator({
+          errorOnFallbackPages: false,
+          errorOnInconsistentLocale: true
+        })
+      ],
       sidebar: [
         {
           label: 'Start Here',
