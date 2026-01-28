@@ -27,28 +27,36 @@ export default function starlightTelescopeIntegration(
         injectScript('page', `import 'starlight-telescope/styles/telescope.css';`);
 
         // 4. Inject client-side script with custom element
-        const escapedConfig = JSON.stringify(config)
-          .replace(/\\/g, '\\\\')
-          .replace(/`/g, '\\`')
-          .replace(/\$/g, '\\$');
+        // Use base64 encoding for safe config transport (avoids XSS via string escaping)
+        const configBase64 = Buffer.from(JSON.stringify(config)).toString('base64');
 
         injectScript(
           'page',
           `
           import 'starlight-telescope/libs/telescope-element';
 
-          function initTelescope() {
-            if (window.__telescopeInitialized) return;
-            window.__telescopeInitialized = true;
+          let initInProgress = false;
 
-            // Inject custom element into header
-            if (!document.querySelector('telescope-search')) {
-              const rightGroup = document.querySelector('.right-group');
-              if (rightGroup) {
-                const el = document.createElement('telescope-search');
-                el.setAttribute('data-config', \`${escapedConfig}\`);
-                rightGroup.insertAdjacentElement('afterbegin', el);
+          function initTelescope() {
+            // Prevent race conditions with initialization lock
+            if (window.__telescopeInitialized || initInProgress) return;
+            initInProgress = true;
+
+            try {
+              // Inject custom element into header
+              if (!document.querySelector('telescope-search')) {
+                const rightGroup = document.querySelector('.right-group');
+                if (rightGroup) {
+                  const el = document.createElement('telescope-search');
+                  // Decode base64 config safely
+                  const configJson = atob('${configBase64}');
+                  el.setAttribute('data-config', configJson);
+                  rightGroup.insertAdjacentElement('afterbegin', el);
+                }
               }
+              window.__telescopeInitialized = true;
+            } finally {
+              initInProgress = false;
             }
           }
 

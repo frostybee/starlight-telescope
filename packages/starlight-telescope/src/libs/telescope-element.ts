@@ -8,18 +8,26 @@ export class TelescopeSearchElement extends HTMLElement {
   connectedCallback() {
     const configStr = this.dataset.config;
     if (!configStr) {
-      console.error('TelescopeSearchElement: missing data-config attribute');
+      console.error('[Telescope] Missing data-config attribute');
       return;
     }
 
-    const config: TelescopeConfig = JSON.parse(configStr);
+    let config: TelescopeConfig;
+    try {
+      config = JSON.parse(configStr);
+    } catch (e) {
+      console.error('[Telescope] Invalid config JSON:', e);
+      return;
+    }
 
     // Render trigger button
     this.innerHTML = this.getTriggerButtonHTML();
 
-    // Platform detection for Mac
+    // Platform detection for Mac (userAgentData with fallback to userAgent)
     const shortcutKey = this.querySelector('.telescope__shortcut-key');
-    if (shortcutKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+    const isMac = (navigator as Navigator & { userAgentData?: { platform: string } }).userAgentData?.platform === 'macOS'
+      || /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
+    if (shortcutKey && isMac) {
       shortcutKey.textContent = '⌘';
       this.querySelector('button')?.setAttribute('aria-keyshortcuts', 'Meta+/');
     }
@@ -38,10 +46,21 @@ export class TelescopeSearchElement extends HTMLElement {
     });
   }
 
+  disconnectedCallback() {
+    // Cleanup to prevent memory leaks
+    this.telescopeSearch?.destroy();
+    this.telescopeSearch = null;
+  }
+
   private getTriggerButtonHTML(): string {
     return `<button class="telescope__trigger-btn" aria-label="Open Telescope Search" aria-keyshortcuts="Control+/">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-        <path d="M21.92 6.62 20.4 2.89a1.5 1.5 0 0 0-1.94-.84l-5.68 2.27a1.5 1.5 0 0 0-.85 1.95l.65 1.61-3.34 1.33-1.08-2.7a1 1 0 0 0-1.3-.56l-1.79.72a1 1 0 0 0-.56 1.3l1.08 2.69-1.67.67a1 1 0 0 0-.56 1.3l.5 1.24a1 1 0 0 0 1.3.56l1.66-.67.37.91a1 1 0 0 0 1.3.56l1.78-.71a1 1 0 0 0 .56-1.3l-.37-.92 3.34-1.34.65 1.62a1.5 1.5 0 0 0 1.94.84l5.68-2.27a1.5 1.5 0 0 0 .85-1.95ZM6.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm2-4.5L7.12 13l2.34-.94 1.38 3.44-.84.34a1 1 0 0 1-1.3-.56l-.2-.5Z"/>
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m10.065 12.493-6.18 1.318a.934.934 0 0 1-1.108-.702l-.537-2.15a1.07 1.07 0 0 1 .691-1.265l13.504-4.44"/>
+        <path d="m13.56 11.747 4.332-.924"/>
+        <path d="m16 21-3.105-6.21"/>
+        <path d="M16.485 5.94a2 2 0 0 1 1.455-2.425l1.09-.272a1 1 0 0 1 1.212.727l1.515 6.06a1 1 0 0 1-.727 1.213l-1.09.272a2 2 0 0 1-2.425-1.455z"/>
+        <path d="m6.158 8.633 1.114 4.456"/>
+        <path d="m8 21 3.105-6.21"/>
       </svg>
       <kbd class="telescope__shortcut sl-hidden md:sl-flex">
         <kbd class="telescope__shortcut-key">Ctrl</kbd>

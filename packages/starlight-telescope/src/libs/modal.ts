@@ -3,7 +3,7 @@ export function getModalHTML(): string {
     <dialog id="telescope-dialog" class="telescope" aria-label="Site search">
       <div class="telescope__modal">
         <button class="telescope__close-button" id="telescope-close-button" aria-label="Close">
-          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
         </button>
         <div class="telescope__tabs" role="tablist">
           <button class="telescope__tab telescope__tab--active" data-tab="search" role="tab" aria-selected="true" id="tab-search">Search</button>

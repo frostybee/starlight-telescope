@@ -17,10 +17,10 @@ editUrl: false
 hero:
   tagline: Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.
   image:
-    html: '<span style="font-size: 8rem;">🔭</span>'
+    file: ../../assets/telescope.svg    
   actions:
     - text: Get Started
-      link: /getting-started/
+      link: /starlight-telescope/getting-started/
       icon: right-arrow
       variant: primary
     - text: View on GitHub
@@ -28,12 +28,15 @@ hero:
       icon: external
 ---
 
-import { CardGrid, LinkCard } from '@astrojs/starlight/components'
+import { CardGrid, Card } from '@astrojs/starlight/components'
 
-## Next Steps
+## Next steps
 
-<CardGrid>
-  <LinkCard title="Getting Started" href="/getting-started/" description="Install and configure the plugin" />
-  <LinkCard title="Configuration" href="/configuration/" description="Explore all options" />
-  <LinkCard title="Styling Guide" href="/guides/styling/" description="Customize the appearance" />
+<CardGrid stagger>
+  <Card title="Install the plugin" icon="puzzle">
+    Check the [getting started guide](/starlight-telescope/getting-started/) for installation instructions.
+  </Card>
+  <Card title="Configure the plugin" icon="setting">
+    Edit your config in the `astro.config.mjs` file. See the [configuration options](/starlight-telescope/configuration/).
+  </Card>
 </CardGrid>

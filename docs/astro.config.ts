@@ -3,9 +3,13 @@ import { defineConfig } from 'astro/config'
 import starlightTelescope from 'starlight-telescope'
 
 export default defineConfig({
+  site: 'https://frostybee.github.io',
+  base: '/starlight-telescope',  
   integrations: [
     starlight({
+      title: 'Starlight Telescope',
       defaultLocale: 'root',
+      favicon: '/images/favicon.svg',
       locales: {
         root: {
           label: 'English',
@@ -42,7 +46,6 @@ export default defineConfig({
       social: [
         { href: 'https://github.com/frostybee/starlight-telescope', icon: 'github', label: 'GitHub' },
       ],
-      title: 'Starlight Telescope',
     }),
   ],
 })

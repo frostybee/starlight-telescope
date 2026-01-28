@@ -1,11 +1,15 @@
 import Fuse, { type FuseResult, type FuseResultMatch, type IFuseOptions } from 'fuse.js';
 import type { TelescopeConfig, TelescopePage } from '../schemas/config.js';
+import { getLocaleFromUrl } from './url.js';
 
 declare global {
   interface Window {
     __telescopeInitialized?: boolean;
   }
 }
+
+// Maximum number of pinned pages to prevent unbounded localStorage growth
+const MAX_PINNED_PAGES = 50;
 
 export default class TelescopeSearch {
   private config: TelescopeConfig;
@@ -23,6 +27,10 @@ export default class TelescopeSearch {
   private currentOrigin: string | null = null;
   private searchResultsWithMatches: FuseResult<TelescopePage>[] = [];
   private currentLocale: string | undefined = undefined;
+  private hasMouseMovedSinceOpen: boolean = false;
+  private fetchInProgress: boolean = false;
+  private abortController: AbortController | null = null;
+  private isInNavigationMode: boolean = false;
 
   // DOM elements
   private dialogElement: HTMLDialogElement | null;
@@ -73,89 +81,56 @@ export default class TelescopeSearch {
     this.setupListeners();
   }
 
+  /**
+   * Validate if a string is a valid CSS color value.
+   */
+  private isValidCssColor(color: string): boolean {
+    const testEl = document.createElement('div');
+    testEl.style.color = color;
+    return testEl.style.color !== '';
+  }
+
+  /**
+   * Safely set a CSS custom property with color validation.
+   */
+  private setThemeColor(root: HTMLElement, property: string, color: string | undefined): void {
+    if (color && this.isValidCssColor(color)) {
+      root.style.setProperty(property, color);
+    }
+  }
+
   private applyTheme(): void {
     const { theme } = this.config;
     const root = document.documentElement;
 
-    if (theme.overlayBackground) {
-      root.style.setProperty('--telescope-overlay-bg', theme.overlayBackground);
-    }
-    if (theme.modalBackground) {
-      root.style.setProperty('--telescope-modal-bg', theme.modalBackground);
-    }
-    if (theme.modalBackgroundAlt) {
-      root.style.setProperty('--telescope-modal-bg-alt', theme.modalBackgroundAlt);
-    }
-    if (theme.accentColor) {
-      root.style.setProperty('--telescope-accent', theme.accentColor);
-    }
-    if (theme.accentHover) {
-      root.style.setProperty('--telescope-accent-hover', theme.accentHover);
-    }
-    if (theme.accentSelected) {
-      root.style.setProperty('--telescope-accent-selected', theme.accentSelected);
-    }
-    if (theme.textPrimary) {
-      root.style.setProperty('--telescope-text-primary', theme.textPrimary);
-    }
-    if (theme.textSecondary) {
-      root.style.setProperty('--telescope-text-secondary', theme.textSecondary);
-    }
-    if (theme.border) {
-      root.style.setProperty('--telescope-border', theme.border);
-    }
-    if (theme.borderActive) {
-      root.style.setProperty('--telescope-border-active', theme.borderActive);
-    }
-    if (theme.pinColor) {
-      root.style.setProperty('--telescope-pin-color', theme.pinColor);
-    }
-    if (theme.tagColor) {
-      root.style.setProperty('--telescope-tag-color', theme.tagColor);
-    }
-  }
-
-  /**
-   * Detect locale from the current page URL.
-   * Checks for locale patterns in the path after the base URL.
-   */
-  private detectLocaleFromPath(): string | undefined {
-    const basePath = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
-    const pathAfterBase = window.location.pathname.slice(basePath.length);
-
-    // Remove leading slash and get first segment
-    const segments = pathAfterBase.replace(/^\//, '').split('/');
-    const firstSegment = segments[0];
-
-    if (!firstSegment) return undefined;
-
-    // Common path segments that should not be treated as locales
-    const commonPathSegments = new Set([
-      'api', 'src', 'css', 'img', 'lib', 'app', 'bin', 'doc', 'log', 'tmp', 'var', 'opt', 'usr', 'etc'
-    ]);
-
-    if (commonPathSegments.has(firstSegment)) {
-      return undefined;
-    }
-
-    // Match strict locale patterns: xx or xx-xx or xx-xxxx
-    // e.g., 'en', 'fr', 'en-us', 'pt-br', 'zh-hans'
-    if (/^[a-z]{2}(-[a-z]{2,4})?$/.test(firstSegment)) {
-      return firstSegment;
-    }
-
-    return undefined;
+    // Apply theme colors with validation
+    this.setThemeColor(root, '--telescope-overlay-bg', theme.overlayBackground);
+    this.setThemeColor(root, '--telescope-modal-bg', theme.modalBackground);
+    this.setThemeColor(root, '--telescope-modal-bg-alt', theme.modalBackgroundAlt);
+    this.setThemeColor(root, '--telescope-accent', theme.accentColor);
+    this.setThemeColor(root, '--telescope-accent-hover', theme.accentHover);
+    this.setThemeColor(root, '--telescope-accent-selected', theme.accentSelected);
+    this.setThemeColor(root, '--telescope-text-primary', theme.textPrimary);
+    this.setThemeColor(root, '--telescope-text-secondary', theme.textSecondary);
+    this.setThemeColor(root, '--telescope-border', theme.border);
+    this.setThemeColor(root, '--telescope-border-active', theme.borderActive);
+    this.setThemeColor(root, '--telescope-pin-color', theme.pinColor);
+    this.setThemeColor(root, '--telescope-tag-color', theme.tagColor);
   }
 
   private async fetchPages(): Promise<void> {
+    // Prevent concurrent fetches
+    if (this.fetchInProgress) return;
+    this.fetchInProgress = true;
+
     this.isLoading = true;
     this.updateLoadingState();
 
     try {
       const basePath = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
 
-      // Detect current locale for locale-aware fetch
-      this.currentLocale = this.detectLocaleFromPath();
+      // Detect current locale using shared utility (DRY)
+      this.currentLocale = getLocaleFromUrl(new URL(window.location.href));
       const localePath = this.currentLocale ? `/${this.currentLocale}` : '';
 
       const response = await fetch(`${basePath}${localePath}/pages.json`);
@@ -200,6 +175,7 @@ export default class TelescopeSearch {
       this.pinnedPages = [];
     } finally {
       this.isLoading = false;
+      this.fetchInProgress = false;
       this.updateLoadingState();
     }
   }
@@ -333,7 +309,11 @@ export default class TelescopeSearch {
       // Remove from pinned
       this.pinnedPages.splice(pageIndex, 1);
     } else {
-      // Add to pinned
+      // Add to pinned with limit enforcement
+      if (this.pinnedPages.length >= MAX_PINNED_PAGES) {
+        // Remove oldest pinned page to make room
+        this.pinnedPages.shift();
+      }
       this.pinnedPages.push(page);
     }
 
@@ -396,15 +376,19 @@ export default class TelescopeSearch {
   }
 
   private setupListeners(): void {
+    // Create AbortController for cleanup
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+
     // Global keyboard shortcut
-    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keydown', this.handleKeyDown, { signal });
 
     // Add event listeners to the search input
     if (this.searchInputElement) {
       // Use debounced version of handleSearchInput to prevent excessive searches
       const debouncedSearchInput = this.debounce(this.handleSearchInput, this.config.debounceMs);
-      this.searchInputElement.addEventListener('input', debouncedSearchInput);
-      this.searchInputElement.addEventListener('keydown', this.handleSearchKeyDown);
+      this.searchInputElement.addEventListener('input', debouncedSearchInput, { signal });
+      this.searchInputElement.addEventListener('keydown', this.handleSearchKeyDown, { signal });
     }
 
     // Use event delegation for dialog interactions - works regardless of when elements exist
@@ -430,7 +414,25 @@ export default class TelescopeSearch {
         this.close();
         return;
       }
-    });
+    }, { signal });
+  }
+
+  /**
+   * Cleanup method to remove event listeners and timers.
+   * Call this when the component is destroyed.
+   */
+  public destroy(): void {
+    // Abort all event listeners
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+
+    // Clear debounce timer
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+    }
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -474,11 +476,13 @@ export default class TelescopeSearch {
 
       case 'ArrowDown':
         event.preventDefault();
+        this.isInNavigationMode = true;
         this.navigateResults(1);
         break;
 
       case 'ArrowUp':
         event.preventDefault();
+        this.isInNavigationMode = true;
         this.navigateResults(-1);
         break;
 
@@ -488,10 +492,12 @@ export default class TelescopeSearch {
         break;
 
       case ' ':
-        // Only handle space for bookmarking if the input is empty or we're at the start
+        // Handle space for bookmarking if input is empty, cursor at start, or navigating results
         if (
           this.searchInputElement &&
-          (this.searchInputElement.value === '' || this.searchInputElement.selectionStart === 0)
+          (this.searchInputElement.value === '' ||
+            this.searchInputElement.selectionStart === 0 ||
+            this.isInNavigationMode)
         ) {
           event.preventDefault();
           this.togglePinForSelectedItem();
@@ -522,6 +528,7 @@ export default class TelescopeSearch {
   }
 
   private handleSearchInput(event: Event): void {
+    this.isInNavigationMode = false;
     const target = event.target as HTMLInputElement;
     this.searchQuery = target.value;
 
@@ -608,7 +615,14 @@ export default class TelescopeSearch {
 
     // Announce result count for screen readers
     const count = this.filteredPages.length;
-    this.announce(count === 0 ? 'No results found' : `${count} result${count === 1 ? '' : 's'} found`);
+    const maxResults = this.config.maxResults;
+    const hasMore = count > maxResults;
+    const announcement = count === 0
+      ? 'No results found'
+      : hasMore
+        ? `Showing ${maxResults} of ${count} results. Refine your search to see more.`
+        : `${count} result${count === 1 ? '' : 's'} found`;
+    this.announce(announcement);
   }
 
   private updateSelectedResult(): void {
@@ -681,6 +695,15 @@ export default class TelescopeSearch {
     this.filteredPages = [...this.allPages];
 
     dialog.showModal();
+
+    // Disable pointer events until mouse moves to prevent false hover on open
+    dialog.classList.add('telescope--pointer-disabled');
+    this.hasMouseMovedSinceOpen = false;
+    dialog.addEventListener('mousemove', () => {
+      this.hasMouseMovedSinceOpen = true;
+      dialog.classList.remove('telescope--pointer-disabled');
+    }, { once: true });
+
     this.switchTab('search');
 
     // Render initial content
@@ -709,6 +732,12 @@ export default class TelescopeSearch {
 
     this.isOpen = false;
     dialog.close();
+
+    // Clear debounce timer to prevent stale callbacks
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+    }
 
     // Clear aria-activedescendant
     const input = document.getElementById('telescope-search-input');
@@ -789,10 +818,11 @@ export default class TelescopeSearch {
     const isPinned = this.isPagePinned(page.path);
     const pinButton = document.createElement('button');
     pinButton.className = `telescope__pin-button${isPinned ? ' telescope__pin-button--pinned' : ''}`;
-    pinButton.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    pinButton.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"></path>
                 </svg>`;
     pinButton.title = isPinned ? 'Unpin page' : 'Pin page';
+    pinButton.setAttribute('aria-label', isPinned ? 'Unpin page' : 'Pin page');
 
     // Stop event propagation to prevent navigation and flickering
     pinButton.addEventListener('click', (event) => {
@@ -857,6 +887,10 @@ export default class TelescopeSearch {
     });
 
     listItem.addEventListener('mouseenter', () => {
+      // Ignore mouseenter until user has actually moved the mouse
+      // This prevents false selection when modal opens under cursor
+      if (!this.hasMouseMovedSinceOpen) return;
+
       this.selectedIndex = index;
       this.updateSelectedResult();
     });
@@ -867,6 +901,13 @@ export default class TelescopeSearch {
   private switchTab(tabName: 'search' | 'recent'): void {
     this.currentTab = tabName;
     this.selectedIndex = 0;
+
+    // Reset search state when switching tabs
+    this.searchQuery = '';
+    if (this.searchInputElement) {
+      this.searchInputElement.value = '';
+    }
+    this.filteredPages = [...this.allPages];
 
     // Update tab buttons
     this.tabs.forEach((tab) => {
@@ -1050,10 +1091,13 @@ export default class TelescopeSearch {
 
   private announce(message: string): void {
     if (this.liveRegion) {
+      // Clear first, then use requestAnimationFrame for better screen reader timing
       this.liveRegion.textContent = '';
-      // Force reflow to ensure screen readers pick up the change
-      void this.liveRegion.offsetHeight;
-      this.liveRegion.textContent = message;
+      requestAnimationFrame(() => {
+        if (this.liveRegion) {
+          this.liveRegion.textContent = message;
+        }
+      });
     }
   }
 }
