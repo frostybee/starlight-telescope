@@ -1,35 +1,25 @@
 ---
-title: Styling & Theming
-description: Customize the appearance of the search modal.
+title: Styling
+description: CSS customization for the search modal.
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components'
+## CSS Variables
 
-## CSS Custom Properties
-
-starlight-telescope uses CSS custom properties for all colors, making it easy to match your site's theme.
-
-### Available Properties
-
-The plugin automatically inherits Starlight's design tokens. You can override any of these:
+The plugin uses CSS custom properties that inherit from Starlight's design tokens. This means the modal automatically matches your site's theme without configuration. Override any of these to customize:
 
 ```css
 :root {
-  /* Overlay/backdrop */
+  /* Backgrounds */
   --telescope-overlay-bg: var(--sl-color-backdrop-overlay);
-
-  /* Modal backgrounds */
   --telescope-modal-bg: var(--sl-color-bg-nav);
   --telescope-modal-bg-alt: var(--sl-color-bg);
 
-  /* Accent colors */
+  /* Accent */
   --telescope-accent: var(--sl-color-accent);
-  --telescope-accent-low: var(--sl-color-accent-low);
-  --telescope-accent-high: var(--sl-color-accent-high);
   --telescope-accent-hover: color-mix(in srgb, var(--telescope-accent) 10%, transparent);
   --telescope-accent-selected: color-mix(in srgb, var(--telescope-accent) 18%, transparent);
 
-  /* Text colors */
+  /* Text */
   --telescope-text-primary: var(--sl-color-white);
   --telescope-text-secondary: var(--sl-color-gray-3);
 
@@ -37,178 +27,68 @@ The plugin automatically inherits Starlight's design tokens. You can override an
   --telescope-border: var(--sl-color-hairline-light);
   --telescope-border-active: var(--sl-color-gray-5);
 
-  /* Feature colors */
+  /* Features */
   --telescope-pin-color: var(--sl-color-purple);
   --telescope-tag-color: var(--sl-color-green);
 }
 ```
 
-## Light and Dark Mode
+## Light/Dark Mode
 
-The plugin inherits Starlight's light/dark mode automatically via CSS variables. Starlight handles `prefers-color-scheme` detection, and telescope inherits those values.
-
-To customize colors per mode:
+Starlight handles theme detection via the `data-theme` attribute on the root element. The plugin inherits these values automatically. To customize colors per mode, target the attribute:
 
 ```css
-:root {
-  --telescope-accent: #7c3aed;
-}
-
 :root[data-theme='light'] {
   --telescope-accent: #6d28d9;
   --telescope-modal-bg: #ffffff;
 }
 ```
 
-## Configuration-Based Theming
+## Config-Based Theming
 
-Set theme colors directly in your config:
+Colors can also be set via the plugin configuration instead of CSS. This is useful for quick customization without a separate stylesheet.
 
-```js
-starlightTelescope({
-  theme: {
-    accentColor: '#7c3aed',
-    accentHover: 'rgba(124, 58, 237, 0.1)',
-    accentSelected: 'rgba(124, 58, 237, 0.15)',
-    pinColor: '#f59e0b',
-    modalBackground: '#1e1e2e',
-  }
-})
-```
+See [Configuration → theme](/configuration/#theme) for available properties.
 
-## CSS Override Method
+## CSS Classes
 
-For more control, override CSS variables in your custom stylesheet:
+The plugin uses BEM naming convention (`telescope__element--modifier`). All classes are prefixed with `telescope` to avoid conflicts with your existing styles.
 
-```css
-/* src/styles/custom.css */
-:root {
-  --telescope-accent: var(--sl-color-accent);
-  --telescope-modal-bg: var(--sl-color-bg);
-}
-```
+| Class | Element |
+|-------|---------|
+| `.telescope` | Modal container |
+| `.telescope__modal` | Content wrapper |
+| `.telescope__search-input` | Search input |
+| `.telescope__result-item` | Result item |
+| `.telescope__result-item--selected` | Selected state |
+| `.telescope__pin-button` | Pin button |
+| `.telescope__pin-button--pinned` | Pinned state |
+| `.telescope__highlight` | Match highlight |
+| `.telescope__section-separator` | Section header |
 
-## Theme Examples
+## Overriding Elements
 
-<Tabs>
-<TabItem label="Purple">
-```js
-theme: {
-  accentColor: '#a855f7',
-  accentHover: 'rgba(168, 85, 247, 0.1)',
-  accentSelected: 'rgba(168, 85, 247, 0.15)',
-  pinColor: '#ec4899',
-}
-```
-</TabItem>
-<TabItem label="Green">
-```js
-theme: {
-  accentColor: '#22c55e',
-  accentHover: 'rgba(34, 197, 94, 0.1)',
-  accentSelected: 'rgba(34, 197, 94, 0.15)',
-  pinColor: '#14b8a6',
-}
-```
-</TabItem>
-<TabItem label="Light">
-```js
-theme: {
-  overlayBackground: 'rgba(255, 255, 255, 0.8)',
-  modalBackground: '#ffffff',
-  modalBackgroundAlt: '#f6f8fa',
-  textPrimary: '#24292f',
-  textSecondary: '#57606a',
-  border: '#d0d7de',
-  borderActive: '#8c959f',
-}
-```
-</TabItem>
-</Tabs>
-
-## Accessibility
-
-When customizing colors, ensure sufficient contrast:
-- **Text on backgrounds:** Minimum 4.5:1 contrast ratio (WCAG AA)
-- **Interactive elements:** Clearly distinguishable focus states
-- **Highlight colors:** Visible against both modal background and text
-
-Use tools like [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to verify your color choices.
-
-## Customizing Specific Elements
-
-### Search Input
+Target specific elements to adjust sizing, spacing, or colors beyond what CSS variables provide:
 
 ```css
 .telescope__search-input {
   font-size: 20px;
-  font-family: var(--__sl-font);
 }
-```
 
-### Result Items
-
-```css
 .telescope__result-item {
   padding: 16px 24px;
 }
 
-.telescope__result-title {
-  font-size: 16px;
-}
-
-.telescope__result-description {
-  font-size: 13px;
-}
-```
-
-### Match Highlighting
-
-```css
 .telescope__highlight {
   background-color: rgba(255, 200, 0, 0.3);
-  border-radius: 3px;
 }
 ```
 
-### Pin Button
+## Accessibility
 
-```css
-.telescope__pin-button {
-  color: #f59e0b;
-}
+When customizing colors, maintain WCAG AA contrast ratios (4.5:1 minimum for text, 3:1 for UI components). Use [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/) to verify your choices.
 
-.telescope__pin-button--pinned {
-  color: #f59e0b;
-  background-color: rgba(245, 158, 11, 0.2);
-}
-```
-
-## Available CSS Classes
-
-The plugin uses BEM naming convention (`telescope__element--modifier`):
-
-| Class | Element |
-|-------|---------|
-| `.telescope` | Modal dialog container |
-| `.telescope__modal` | Modal content wrapper |
-| `.telescope__search-input` | Search input field |
-| `.telescope__tabs` | Tab bar container |
-| `.telescope__tab` | Individual tab |
-| `.telescope__tab--active` | Active tab |
-| `.telescope__result-item` | Search result item |
-| `.telescope__result-item--selected` | Selected result item |
-| `.telescope__result-title` | Result title |
-| `.telescope__result-description` | Result description |
-| `.telescope__pin-button` | Pin/bookmark button |
-| `.telescope__pin-button--pinned` | Pinned state |
-| `.telescope__highlight` | Match highlight |
-| `.telescope__section-separator` | Section header |
-| `.telescope__footer` | Modal footer |
-
-## Reduced Motion
-
-The plugin respects `prefers-reduced-motion`. When users prefer reduced motion, all animations are disabled:
+The plugin respects `prefers-reduced-motion`. Animations are disabled automatically for users who prefer reduced motion:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -220,20 +100,16 @@ The plugin respects `prefers-reduced-motion`. When users prefer reduced motion, 
 }
 ```
 
-## Responsive Design
+## Responsive
 
-The modal is responsive by default:
-- **Desktop:** 640px width, centered
-- **Tablet/Mobile:** 95% width with adjusted spacing
+The modal adapts to screen size automatically. Default behavior:
+- Desktop: 640px max-width, centered
+- Mobile: 95% width with reduced padding
 
-Custom breakpoint adjustments:
+Override breakpoint styles as needed:
 
 ```css
 @media (max-width: 768px) {
-  .telescope__modal {
-    border-radius: 0;
-  }
-
   .telescope__search-input {
     font-size: 16px;
   }

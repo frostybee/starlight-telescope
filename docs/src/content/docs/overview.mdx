@@ -1,0 +1,34 @@
+---
+title: What is Starlight Telescope?
+description: A keyboard-first command palette for navigating your Starlight documentation.
+---
+
+Starlight Telescope is a **keyboard-first command palette** for navigating your Starlight documentation. Think of it as a quick switcher that lets you jump to any page without reaching for your mouse.
+
+Press `Ctrl+/` (or `Cmd+/` on Mac) from anywhere in your docs, start typing, and instantly find the page you need.
+
+Telescope does **not** replace Starlight's built-in search powered by [Pagefind](https://pagefind.app/). Instead, it works alongside it. Use Pagefind for full-text content search, and Telescope for quickly jumping to pages you already know by name.
+
+## Why Use It?
+
+Starlight already includes an integrated search feature. So why add Telescope?
+
+| Feature | Pagefind | Telescope |
+|---------|----------|-----------|
+| **Search type** | Full-text content search | Page title/path fuzzy matching |
+| **Best for** | Finding content within pages | Jumping to a known page quickly |
+| **Typo tolerance** | Exact matching | Fuzzy matching (finds "config" when you type "cnfig") |
+| **Recent pages** | No | Yes - tracks your navigation history |
+| **Pinned pages** | No | Yes - bookmark frequently used pages |
+| **Keyboard UX** | Good | Optimized for keyboard-only navigation |
+
+**Use both together:** Pagefind for "what page mentions X?" and Telescope for "take me to the config page."
+
+## Key Features
+
+- Fuzzy search powered by [Fuse.js](https://www.fusejs.io/) that finds pages even when you mistype
+- Tracks your recently visited pages so you can quickly get back to them
+- Pin pages you use frequently with the Space key
+- Fully keyboard-driven: open with `Ctrl+/`, navigate with arrows, select with Enter
+- Customizable colors to match your site
+- Works with Starlight's i18n, showing pages for your current language

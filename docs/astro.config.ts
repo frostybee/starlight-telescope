@@ -23,15 +23,13 @@ export default defineConfig({
       sidebar: [
         {
           label: 'Start Here',
-          items: ['getting-started', 'configuration'],
+          items: ['overview', 'getting-started', 'configuration'],
         },
         {
           label: 'Guides',
           items: [
             'guides/keyboard-shortcuts',
-            'guides/fuzzy-search',
-            'guides/recent-pages',
-            'guides/pinned-pages',
+            'guides/features',
             'guides/styling',
             'guides/internationalization',
           ],

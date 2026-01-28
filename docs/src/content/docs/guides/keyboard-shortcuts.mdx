@@ -1,31 +1,23 @@
 ---
 title: Keyboard Shortcuts
-description: Master keyboard navigation in starlight-telescope.
+description: Keyboard shortcuts and customization options.
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components'
+## Default Shortcut
 
-## Opening the Search Modal
+**Ctrl+/** (Windows/Linux) or **Cmd+/** (Mac) opens the search modal. The trigger button displays the appropriate shortcut for the detected platform.
 
-By default, press **Ctrl+/** (Windows/Linux) or **Cmd+/** (Mac) to open the search.
-
-The plugin automatically detects your platform and displays the appropriate shortcut in the trigger button.
-
-## Navigation Shortcuts
-
-Once the modal is open:
+## Navigation
 
 | Key | Action |
 |-----|--------|
-| **Arrow Down** | Move to next result |
-| **Arrow Up** | Move to previous result |
-| **Enter** | Navigate to selected page |
-| **Space** | Pin/unpin selected page (when not typing) |
-| **Escape** | Close the modal |
+| **Arrow Down** | Next result |
+| **Arrow Up** | Previous result |
+| **Enter** | Navigate to page |
+| **Space** | Pin/unpin (when not typing) |
+| **Escape** | Close modal |
 
-## Customizing the Shortcut
-
-### Using Ctrl+K (VS Code style)
+## Customization
 
 ```js
 starlightTelescope({
@@ -33,74 +25,23 @@ starlightTelescope({
 })
 ```
 
-### Using Ctrl+P (Quick Open style)
+See [Configuration → shortcut](/configuration/#shortcut) for all options.
 
-```js
-starlightTelescope({
-  shortcut: { key: 'p', ctrl: true, meta: true }
-})
-```
-
-### Adding Shift Modifier
-
-```js
-starlightTelescope({
-  shortcut: { key: 'f', ctrl: true, meta: true, shift: true }
-})
-```
-
-### Avoiding Browser Conflicts
-
-Some shortcuts conflict with browser or OS defaults:
+### Browser Conflicts
 
 | Shortcut | Conflict |
 |----------|----------|
-| **Ctrl+K** | Browser address bar (Chrome), Command palette (VS Code) |
-| **Ctrl+P** | Print dialog (all browsers) |
+| **Ctrl+K** | Browser address bar (Chrome) |
+| **Ctrl+P** | Print dialog |
 | **Ctrl+F** | Browser find |
 
-The default **Ctrl+/** is chosen because it has minimal conflicts. If you customize the shortcut, test across browsers your users are likely to use.
-
-## Shortcut Options
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `key` | `string` | `'/'` | The key to press |
-| `ctrl` | `boolean` | `true` | Require Ctrl key |
-| `meta` | `boolean` | `true` | Require Meta/Cmd key (Mac) |
-| `shift` | `boolean` | `false` | Require Shift key |
-| `alt` | `boolean` | `false` | Require Alt key |
-
-## Platform Detection
-
-The plugin automatically:
-- Shows **Ctrl** on Windows/Linux
-- Shows **⌘** (Cmd) on Mac
-- Sets appropriate `aria-keyshortcuts` attribute for accessibility
-
-## Keyboard Flow Example
-
-```
-1. Ctrl+/ → Open modal
-2. Type "api" → Filter results
-3. ↓ ↓ → Navigate to "API Reference"
-4. Space → Pin the page
-5. Enter → Navigate to page
-
-Next time:
-1. Ctrl+/ → "API Reference" appears at top (pinned)
-```
+The default **Ctrl+/** avoids these conflicts.
 
 ## Accessibility
 
-All keyboard interactions are accessible:
-- **ARIA live regions** announce navigation changes to screen readers
-- **Focus management:** focus moves to search input when modal opens
-- **Tab trapping:** focus stays within modal while open
-- **Reduced motion:** animations respect `prefers-reduced-motion`
+- ARIA live regions announce changes to screen readers
+- Focus moves to search input when modal opens
+- Focus is trapped within the modal
+- Animations respect `prefers-reduced-motion`
 
-For more on keyboard accessibility, see [WCAG 2.1 Keyboard Accessible guidelines](https://www.w3.org/WAI/WCAG21/Understanding/keyboard-accessible).
-
-### Mobile Support
-
-On mobile devices, the search modal is opened via the visual trigger button since keyboard shortcuts aren't available. All touch interactions are fully supported.
+On mobile, the search opens via the trigger button.

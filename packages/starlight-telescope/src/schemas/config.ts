@@ -9,7 +9,13 @@ export const ShortcutSchema = z
     shift: z.boolean().default(false),
     alt: z.boolean().default(false),
   })
-  .default({});
+  .default({
+    key: '/',
+    ctrl: true,
+    meta: true,
+    shift: false,
+    alt: false,
+  });
 
 // Fuse.js options schema - optimized for quick page navigation
 export const FuseOptionsSchema = z
@@ -33,7 +39,19 @@ export const FuseOptionsSchema = z
         { name: 'description', weight: 0.3 },
       ]),
   })
-  .default({});
+  .default({
+    threshold: 0.3,
+    ignoreLocation: true,
+    distance: 100,
+    minMatchCharLength: 2,
+    findAllMatches: false,
+    keys: [
+      { name: 'title', weight: 1.0 },
+      { name: 'path', weight: 0.6 },
+      { name: 'tags', weight: 0.5 },
+      { name: 'description', weight: 0.3 },
+    ],
+  });
 
 // Theme customization schema
 export const ThemeSchema = z
@@ -63,7 +81,11 @@ export const TelescopeConfigSchema = z
     debounceMs: z.number().min(0).max(1000).default(100),
     theme: ThemeSchema,
   })
-  .default({});
+  .default({
+    recentPagesCount: 5,
+    maxResults: 20,
+    debounceMs: 100,
+  });
 
 // Inferred types
 export type TelescopeConfig = z.infer<typeof TelescopeConfigSchema>;

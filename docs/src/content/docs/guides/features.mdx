@@ -1,0 +1,92 @@
+---
+title: Features
+description: Search, pinned pages, and recent page tracking.
+---
+
+## Fuzzy Search
+
+The plugin uses [Fuse.js](https://fusejs.io/) for fuzzy matching. Users can find pages with typos or partial queries.
+
+### Ranking
+
+Results are ranked by:
+1. Exact title matches
+2. Title prefix matches (e.g., "get" → "Getting Started")
+3. Word-start matches (e.g., "auth" → "OAuth Authentication")
+4. Fuse.js fuzzy score
+
+Matching text is highlighted using `<mark class="telescope__highlight">`.
+
+### Configuration
+
+The `threshold` option (0.0–1.0) controls match strictness. Lower values require closer matches.
+
+- `0.0`: Exact matches only
+- `0.3`: Minor typos allowed (default)
+- `0.6+`: Lenient matching
+
+Other options include `distance`, `ignoreLocation`, and `keys`. See [Configuration → fuseOptions](/configuration/#fuseoptions) for details.
+
+### Performance
+
+For large sites (500+ pages), increase `debounceMs` to 150–200ms and consider setting `ignoreLocation: false`. Defaults work well up to ~1000 pages.
+
+---
+
+## Pinned Pages
+
+Pinned pages appear at the top of the search modal, above recent pages and search results. They persist across sessions.
+
+### Usage
+
+- **Keyboard:** Navigate to a result, press **Space**
+- **Mouse:** Click the bookmark icon
+
+Pinned pages show a filled bookmark icon. Unpinned pages show an outline.
+
+### Storage
+
+Stored in `localStorage` under `telescope_pinnedPages`. Click **Clear** to remove all pins.
+
+### Customization
+
+Change the pin color via config or CSS:
+
+```js
+starlightTelescope({
+  theme: { pinColor: '#f59e0b' }
+})
+```
+
+```css
+:root {
+  --telescope-pin-color: #ec4899;
+}
+```
+
+---
+
+## Recent Pages
+
+Pages visited via the search modal are tracked and displayed in a "Recently Visited" section. The modal also has a dedicated "Recent" tab.
+
+### Behavior
+
+- Pages are added when navigating via search modal
+- Most recent pages appear first
+- History persists across sessions via `localStorage`
+- Pages are validated against current site content on load
+
+### Storage
+
+Stored in `localStorage` under `telescope_recentPages`. Click **Clear** to remove all recent pages.
+
+### Configuration
+
+Set `recentPagesCount` to control how many pages are shown (0–20). Set to `0` to disable. See [Configuration → recentPagesCount](/configuration/#recentpagescount).
+
+---
+
+## Locale Behavior
+
+Both pinned and recent pages are locale-aware. Pages saved in English only appear when viewing English docs. See [Internationalization](/guides/internationalization/) for details.
