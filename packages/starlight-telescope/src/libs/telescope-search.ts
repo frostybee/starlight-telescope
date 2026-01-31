@@ -380,8 +380,8 @@ export default class TelescopeSearch {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
 
-    // Global keyboard shortcut
-    document.addEventListener('keydown', this.handleKeyDown, { signal });
+    // Global keyboard shortcut - use capture phase to intercept before other handlers
+    document.addEventListener('keydown', this.handleKeyDown, { signal, capture: true });
 
     // Add event listeners to the search input
     if (this.searchInputElement) {
@@ -435,14 +435,60 @@ export default class TelescopeSearch {
     }
   }
 
+  /**
+   * Convert a key character to its corresponding keyboard code.
+   * This enables layout-independent key detection for international keyboards.
+   */
+  private getKeyCode(key: string): string | null {
+    // Single letter keys (a-z, A-Z)
+    if (/^[a-zA-Z]$/.test(key)) {
+      return `Key${key.toUpperCase()}`;
+    }
+
+    // Digit keys (0-9)
+    if (/^[0-9]$/.test(key)) {
+      return `Digit${key}`;
+    }
+
+    // Special character mappings
+    const specialKeys: Record<string, string> = {
+      '/': 'Slash',
+      '\\': 'Backslash',
+      '-': 'Minus',
+      '=': 'Equal',
+      '[': 'BracketLeft',
+      ']': 'BracketRight',
+      ';': 'Semicolon',
+      "'": 'Quote',
+      ',': 'Comma',
+      '.': 'Period',
+      '`': 'Backquote',
+      ' ': 'Space',
+    };
+
+    return specialKeys[key] || null;
+  }
+
   private handleKeyDown(event: KeyboardEvent): void {
     const { shortcut } = this.config;
 
-    // Check if the configured shortcut is pressed
-    const keyMatches = event.key === shortcut.key;
+    // Check key with code fallback for international keyboards
+    // event.code is layout-independent (e.g., 'Slash' for / key position)
+    const expectedCode = this.getKeyCode(shortcut.key);
+    const keyMatchesViaCharacter = event.key === shortcut.key;
+    const keyMatchesViaCode = expectedCode !== null && event.code === expectedCode;
+    const keyMatches = keyMatchesViaCharacter || keyMatchesViaCode;
+
     const ctrlMatches = shortcut.ctrl ? event.ctrlKey : !event.ctrlKey;
     const metaMatches = shortcut.meta ? event.metaKey : !event.metaKey;
-    const shiftMatches = shortcut.shift ? event.shiftKey : !event.shiftKey;
+    // For character-based matches (event.key), only require shift if explicitly configured.
+    // This handles international keyboards where characters like '/' may require shift to type.
+    // For physical key matches (event.code), enforce shift normally.
+    const shiftMatches = keyMatchesViaCharacter
+      ? !shortcut.shift || event.shiftKey
+      : shortcut.shift
+        ? event.shiftKey
+        : !event.shiftKey;
     const altMatches = shortcut.alt ? event.altKey : !event.altKey;
 
     // For the default "/" shortcut, allow either Ctrl or Meta (Cmd on Mac)
@@ -453,6 +499,7 @@ export default class TelescopeSearch {
 
     if (keyMatches && modifierMatches && shiftMatches && altMatches) {
       event.preventDefault();
+      event.stopPropagation(); // Prevent other handlers from processing this event
       this.open();
     }
 

@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "pnpm -F starlight-telescope-docs dev",
-    "build": "pnpm -F starlight-telescope build",
+    "build": "pnpm -F starlight-telescope-docs build",
     "build:docs": "pnpm -F starlight-telescope-docs build",
     "start:docs": "pnpm -F starlight-telescope-docs start",
     "ci-version": "changeset version && pnpm install --no-frozen-lockfile",

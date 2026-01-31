@@ -42,8 +42,11 @@ export const GET: APIRoute = async ({ params }) => {
       return pageLocale === locale;
     });
 
+    // Filter out draft pages
+    const publishedPages = localePages.filter((page) => !page.data.draft);
+
     // Filter out the home page (served at /, not /index)
-    const filteredPages = localePages.filter(
+    const filteredPages = publishedPages.filter(
       (page) => stripLocaleFromPath(page.id) !== 'index'
     );
 
