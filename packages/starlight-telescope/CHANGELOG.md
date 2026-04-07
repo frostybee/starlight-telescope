@@ -1,5 +1,11 @@
 # starlight-telescope
 
+## 1.0.0
+
+### Major Changes
+
+- 5051914: Upgrade to Astro 6
+
 ## 0.2.0
 
 ### Minor Changes
