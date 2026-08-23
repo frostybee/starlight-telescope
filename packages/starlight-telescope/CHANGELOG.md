@@ -1,5 +1,11 @@
 # starlight-telescope
 
+## 2.0.0
+
+### Major Changes
+
+- b8ec263: Upgrade to Astro 7 and Starlight 0.41. Drops support for Astro <7 and Starlight <0.41.
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,6 +1,6 @@
 {
   "name": "starlight-telescope",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.",
   "author": "frostybee",
