@@ -1,10 +1,17 @@
-<div align="center">
-  <h1>Starlight Telescope</h1>
-  <p>Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.</p>
+<h1 align="center">Starlight Telescope</h1>
 
-  [![npm version](https://badge.fury.io/js/starlight-telescope.svg)](https://badge.fury.io/js/starlight-telescope)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-</div>
+<p align="center">
+  <a href="https://www.npmjs.com/package/starlight-telescope"><img src="https://img.shields.io/npm/v/starlight-telescope.svg" alt="npm version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+</p>
+
+<p align="center">
+  <a href="https://frostybee.github.io/starlight-telescope/"><strong>Documentation</strong></a> ·
+  <a href="https://frostybee.github.io/starlight-telescope/configuration/">Configuration</a> ·
+  <a href="https://github.com/frostybee/starlight-telescope/releases">Releases</a>
+</p>
+
+Quickly navigate to any page in your Starlight docs with fuzzy search and keyboard-first navigation.
 
 ## Features
 

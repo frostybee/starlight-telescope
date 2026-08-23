@@ -13,14 +13,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.37.4",
-    "astro": "^5.16.16",
+    "@astrojs/starlight": "^0.41.7",
+    "astro": "^7.2.4",
     "sharp": "^0.34.5",
-    "starlight-links-validator": "^0.19.2",
+    "starlight-links-validator": "^0.25.3",
     "starlight-telescope": "workspace:*"
   },
   "engines": {
-    "node": "^18.17.1 || ^20.3.0 || >=21.0.0"
+    "node": ">=22.12.0"
   },
   "private": true,
   "homepage": "https://github.com/frostybee/starlight-telescope",
